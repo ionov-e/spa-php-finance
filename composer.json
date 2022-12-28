@@ -1,0 +1,15 @@
+{
+  "require": {
+    "ext-iconv": "*",
+    "ext-simplexml": "*",
+    "monolog/monolog": "^3.2",
+    "vlucas/phpdotenv": "*",
+    "ext-pdo": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src"
+    }
+  }
+}
