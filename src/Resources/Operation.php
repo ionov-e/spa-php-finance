@@ -16,13 +16,13 @@ class Operation
     }
 
     /** @throws UnexpectedValueException */
-    public static function createFromPost(): self
+    public static function createFromArray(array $array): self
     {
-        Log::info("Post-content: " . json_encode($_POST));
+        Log::info("Post-content: " . json_encode($array));
 
-        $isIncome = $_POST[IS_INCOME_KEY_NAME];
-        $amount = $_POST[AMOUNT_KEY_NAME];
-        $comment = $_POST[COMMENT_KEY_NAME];
+        $isIncome = $array[IS_INCOME_KEY_NAME];
+        $amount = $array[AMOUNT_KEY_NAME];
+        $comment = $array[COMMENT_KEY_NAME];
 
         switch (true) {
             case strlen($comment) > 60:

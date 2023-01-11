@@ -126,7 +126,7 @@ class DbMySQL implements DbInterface
 
     private function getUserRow(string $login): array|false
     {
-        $sql = sprintf('SELECT * FROM users WHERE %s = :login', LOGIN_KEY_NAME);
+        $sql = sprintf('SELECT * FROM users WHERE %s = :login', LOGIN_FOR_LOGIN_KEY_NAME);
         $sth = $this->pdo->prepare($sql, [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]);
         $sth->execute(['login' => $login]);
         return $sth->fetch(PDO::FETCH_ASSOC);

@@ -23,12 +23,11 @@ define('PROJECT_DIR', dirname(__DIR__));
 
 const LOG_PATH = PROJECT_DIR . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . "monolog.log";
 const LOG_MAX_DAYS = 120;
-
 const UNAUTHENTICATED_KEY_NAME = 'unauthenticated';
 const SEARCH_KEY_NAME = 'search';
 const OPERATION_ID_KEY_NAME = 'operation_id';
-const REGISTER_KEY_NAME = 'register';
-const LOGIN_KEY_NAME = 'login';
+const LOGIN_FOR_REGISTER_KEY_NAME = 'register';
+const LOGIN_FOR_LOGIN_KEY_NAME = 'login';
 const LOGOUT_KEY_NAME = 'logout';
 const PASSWORD_KEY_NAME = 'password';
 const PASSWORD_HASHED_KEY_NAME = 'password_hashed';
@@ -40,10 +39,9 @@ const COMMENT_KEY_NAME = 'comment';
 const AUTHENTICATED_USER_ID = 'auth_user_id';
 const NEW_OPERATION_KEY_NAME = 'new_operation';
 const NOTIFICATION = 'notification';
+const PASSWORD_FOR_LOGIN_ID = 'password-login';
+const PASSWORD_FOR_REGISTER_ID = 'password-register';
 
 // Установка часового пояса как в примере (где бы не выполнялся скрипт - одинаковое время)
 date_default_timezone_set('Europe/Moscow');
 
-session_start();
-
-header('Content-Type: application/json; charset=utf-8');

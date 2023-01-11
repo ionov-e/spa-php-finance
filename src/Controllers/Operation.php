@@ -43,12 +43,12 @@ class Operation
         }
     }
 
-    public function store(): never
+    public function store(array $postFromJson): never
     {
         Log::init('opStore');
 
         try {
-            $operationResource = \App\Resources\Operation::createFromPost();
+            $operationResource = \App\Resources\Operation::createFromArray($postFromJson);
             $this->db->storeOperation($operationResource);
             Response::success();
         } catch (UnexpectedValueException $e) {

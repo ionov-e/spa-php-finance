@@ -1,19 +1,26 @@
 <?php
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "global.php";
 
+session_start();
+header('Content-Type: application/json; charset=utf-8');
+
 use App\Controllers;
 use App\Services\DbMySQL;
 use App\Services\Response;
+use App\Services\Input;
+
 
 // ----------------------- Also available for unauthenticated users
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $postFromJson = Input::getArrayFromJsonPost();
+
     switch (true) { // Every method returns never
-        case !empty($_POST[REGISTER_KEY_NAME]):
-            (new Controllers\User(new DbMySQL()))->register();
-        case !empty($_POST[LOGIN_KEY_NAME]):
-            (new Controllers\User(new DbMySQL()))->login();
-        case !empty($_POST[LOGOUT_KEY_NAME]):
+        case !empty($postFromJson[LOGIN_FOR_REGISTER_KEY_NAME]):
+            (new Controllers\User(new DbMySQL()))->register($postFromJson);
+        case !empty($postFromJson[LOGIN_FOR_LOGIN_KEY_NAME]):
+            (new Controllers\User(new DbMySQL()))->login($postFromJson);
+        case !empty($postFromJson[LOGOUT_KEY_NAME]):
             (new Controllers\User(new DbMySQL()))->logout();
     }
 
@@ -35,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    if (!empty($_POST[AMOUNT_KEY_NAME])) {
-        (new Controllers\Operation(new DbMySQL()))->store();
+    if (!empty($postFromJson[AMOUNT_KEY_NAME])) {
+        (new Controllers\Operation(new DbMySQL()))->store($postFromJson);
     }
 
 }

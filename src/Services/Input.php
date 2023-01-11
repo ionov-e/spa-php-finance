@@ -6,6 +6,21 @@ use UnexpectedValueException;
 
 class Input
 {
+    public static function getArrayFromJsonPost(): array
+    {
+        if (!$postInput = file_get_contents('php://input')) {
+            return [];
+        }
+
+        if (!$decodedJson = json_decode($postInput, true)) {
+            Log::error("Failed to json_decode received 'php://input': " . $postInput);
+            return [];
+        }
+
+        Log::debug("json_decoded from 'php://input'" . json_encode($decodedJson));
+        return $decodedJson;
+    }
+
     public static function getOperationIdFromGet(): int
     {
         $defaultErrorMessage = 'ID should be a positive number';

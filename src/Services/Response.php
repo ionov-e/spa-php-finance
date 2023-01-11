@@ -7,9 +7,9 @@ use App\Interfaces\DbInterface;
 
 class Response
 {
-    private const STATUS_SUCCESS = 'success';   // Required keys: status, data
-    private const STATUS_FAIL = 'fail';         // Required keys: status, data
-    private const STATUS_ERROR = 'error';       // Required keys: status, message.   Optional: data
+    public const STATUS_SUCCESS = 'success';   // Required keys: status, data
+    public const STATUS_FAIL = 'fail';         // Required keys: status, data
+    public const STATUS_ERROR = 'error';       // Required keys: status, message.   Optional: data
 
     public static function success(array $data = null): never
     {
@@ -86,7 +86,11 @@ class Response
         $message = '';
 
         if (!empty($_POST)) {
-            $message .= 'Post content: ' . json_encode($_POST, JSON_UNESCAPED_UNICODE);
+            $message .= 'Post: ' . json_encode($_POST, JSON_UNESCAPED_UNICODE);
+        }
+
+        if ($postInput = file_get_contents('php://input')) {
+            $message .= 'Post-input: ' . $postInput;
         }
 
         if (!empty($_POST) && !empty($_GET)) {
@@ -94,7 +98,7 @@ class Response
         }
 
         if (!empty($_GET)) {
-            $message .= 'Get content : ' . json_encode($_GET, JSON_UNESCAPED_UNICODE);
+            $message .= 'Get: ' . json_encode($_GET, JSON_UNESCAPED_UNICODE);
         }
 
         Log::warning($message);

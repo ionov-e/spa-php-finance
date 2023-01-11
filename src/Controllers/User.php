@@ -12,11 +12,11 @@ class User
     {
     }
 
-    public function register(): never
+    public function register(array $postFromJson): never
     {
         Log::init('reg');
-        $login = $_POST[LOGIN_KEY_NAME];
-        $password = $_POST[PASSWORD_KEY_NAME];
+        $login = $postFromJson[LOGIN_FOR_REGISTER_KEY_NAME];
+        $password = $postFromJson[PASSWORD_FOR_REGISTER_ID];
         Log::debug("Received: login: '$login', password: '$password'");
 
         try {
@@ -37,12 +37,12 @@ class User
         Response::fail([NOTIFICATION => $alertMessage]);
     }
 
-    public function login(): never
+    public function login(array $postFromJson): never
     {
         Log::init('login');
         unset($_SESSION[AUTHENTICATED_USER_ID]);
-        $login = $_POST[LOGIN_KEY_NAME];
-        $password = $_POST[PASSWORD_KEY_NAME];
+        $login = $postFromJson[LOGIN_FOR_LOGIN_KEY_NAME];
+        $password = $postFromJson[PASSWORD_FOR_LOGIN_ID];
         Log::debug("Received: login: '$login', password: '$password'");
 
         try {
