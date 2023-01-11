@@ -13,7 +13,7 @@ function createLoginForm() {
     let anotherFormLink = createAnotherFormLink('Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID)
 
     buttonBlock.onclick = function () {
-        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID], processLoginAndRegisterResponse)
+        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(r => processLoginAndRegisterResponse(r))
     }
 
     rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, buttonBlock, anotherFormLink)
@@ -21,7 +21,7 @@ function createLoginForm() {
     containerBlock.append(rootBlock)
 }
 
-async function sendData(inputIds, processResultCallback) {
+async function sendData(inputIds) {
     let inputData = {}
 
     inputIds.forEach((id) => {
@@ -34,9 +34,7 @@ async function sendData(inputIds, processResultCallback) {
         body: JSON.stringify(inputData)
     });
 
-    let result = await response.json()
-
-    processResultCallback(result)
+    return await response.json()
 }
 
 function showList() {
@@ -69,7 +67,7 @@ function createRegisterForm() {
     rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, passwordRepeatInputBlock, buttonBlock, anotherFormLink)
 
     buttonBlock.onclick = function () {
-        sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID], processLoginAndRegisterResponse)
+        sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(r => processLoginAndRegisterResponse(r))
     }
 
     containerBlock.append(rootBlock)
