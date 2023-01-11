@@ -1,7 +1,14 @@
-containerBlock = document.querySelector('#container')
-
+let containerBlock = createContainerBlock()
 createLoginForm()
 createRegisterForm()
+
+function createContainerBlock() {
+    let containerBlock = document.createElement('div')
+    containerBlock.classList.add('flex', 'flex-col', 'overflow-hidden', 'container', 'mx-auto', 'py-2', 'sm:px-6', 'lg:px-8')
+    containerBlock.setAttribute('id', 'container')
+    document.body.append(containerBlock)
+    return containerBlock
+}
 
 function createLoginForm() {
     let rootBlock = createFormRootBlock(LOGIN_FORM_ID)

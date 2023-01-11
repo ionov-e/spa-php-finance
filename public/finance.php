@@ -14,8 +14,6 @@ use \App\Services\Response;
 </head>
 <body>
 
-<div id="container" class="flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8">
-</div>
 
 <script src="https://unpkg.com/flowbite@1.5.5/dist/flowbite.js"></script>
 <script>
