@@ -49,6 +49,7 @@ class User
             $loginStatus = $this->db->login($login, $password);
 
             if ($loginStatus === DbInterface::RESULT_SUCCESS) {
+                $_SESSION[AUTHENTICATED_USER_ID] = $this->db->getUserID($login);
                 Response::success();
             }
 
