@@ -3,11 +3,24 @@ createLoginForm()
 createRegisterForm()
 
 function createContainerBlock() {
-    let containerBlock = document.createElement('div')
-    containerBlock.classList.add('flex', 'flex-col', 'overflow-hidden', 'container', 'mx-auto', 'py-2', 'sm:px-6', 'lg:px-8')
-    containerBlock.setAttribute('id', 'container')
-    document.body.append(containerBlock)
-    return containerBlock
+    return createDiv("flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container')
+}
+
+/**
+ * @param {string} classes
+ * @param {string} id
+ * @returns {HTMLDivElement}
+ */
+function createDiv(classes, id) {
+    let divBlock = document.createElement('div')
+    addClassesToHtml(divBlock, classes)
+
+    if (id) {
+        divBlock.setAttribute('id', 'container')
+    }
+
+    document.body.append(divBlock)
+    return divBlock
 }
 
 function createLoginForm() {
@@ -51,7 +64,7 @@ function showList() {
 function processLoginAndRegisterResponse(result) { // success or fail
 
     if (result.status === STATUS_SUCCESS) {
-        return showList()
+        return askList()
     } else if (result.status === STATUS_FAIL) {
         return alert(result.data[NOTIFICATION])
     }
@@ -86,7 +99,7 @@ function createRegisterForm() {
  */
 function createFormRootBlock(id) {
     let rootBlock = document.createElement('div')
-    rootBlock.classList.add('pt-16', 'mt-8', 'grid', 'grid-cols-1', 'gap-6', 'mx-auto')
+    addClassesToHtml(rootBlock, "pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto")
     rootBlock.setAttribute('id', id)
     return rootBlock
 }
@@ -97,7 +110,7 @@ function createFormRootBlock(id) {
  */
 function createFormHeader(header) {
     let h2Block = document.createElement('h2')
-    h2Block.classList.add('text-2xl', 'font-bold')
+    addClassesToHtml(h2Block, 'text-2xl font-bold')
     h2Block.innerText = header
     return h2Block
 }
@@ -140,7 +153,7 @@ function getInputBlockForForm(inputType, id) {
         inputBlock.setAttribute('type', inputType)
     }
 
-    inputBlock.classList.add('mt-0', 'block', 'w-full', 'px-0.5', 'border-0', 'border-b-2', 'border-gray-200', 'focus:ring-0', 'focus:border-black')
+    addClassesToHtml(inputBlock, "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black")
     inputBlock.setAttribute('name', id)
     inputBlock.setAttribute('id', id)
     inputBlock.setAttribute('required', '')
@@ -161,7 +174,7 @@ function getInputBlockForForm(inputType, id) {
 function createFormButton(text, buttonId) {
 
     let buttonBlock = document.createElement('button')
-    buttonBlock.classList.add('text-white', 'bg-blue-700', 'hover:bg-blue-800', 'focus:outline-none', 'focus:ring-4', 'focus:ring-blue-300', 'font-medium', 'rounded-full', 'text-sm', 'px-5', 'py-2.5', 'text-center', 'mx-2', 'my-3', 'dark:bg-blue-600', 'dark:hover:bg-blue-700', 'dark:focus:ring-blue-800')
+    addClassesToHtml(buttonBlock, "text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800")
     buttonBlock.setAttribute('type', 'button')
     buttonBlock.setAttribute('id', buttonId)
     buttonBlock.innerText = text
@@ -176,7 +189,7 @@ function createFormButton(text, buttonId) {
  */
 function createAnotherFormLink(text, currentFormId, anotherFormId) {
     let linkBlock = document.createElement('a')
-    linkBlock.classList.add('font-medium', 'text-blue-600', 'text-right', 'dark:text-blue-500', 'hover:underline')
+    addClassesToHtml(linkBlock, 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline')
     linkBlock.innerText = text
     linkBlock.onclick = function () {
         document.getElementById(currentFormId).style.display = 'none'
@@ -191,7 +204,16 @@ function createAnotherFormLink(text, currentFormId, anotherFormId) {
  */
 function createHeader(text) {
     let headerBlock = document.createElement('h1')
-    headerBlock.classList.add('text-3xl', 'font-bold', 'underline', 'mx-auto my-5')
+    addClassesToHtml(headerBlock, 'text-3xl font-bold underline mx-auto my-5')
     headerBlock.innerText = text
     return headerBlock
+}
+
+/**
+ * @param {HTMLElement} htmlElement
+ * @param {string} classes
+ */
+function addClassesToHtml(htmlElement, classes) {
+    let classesArray = classes.split(' ')
+    htmlElement.classList.add(...classesArray)
 }
