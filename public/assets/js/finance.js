@@ -3,20 +3,26 @@ createLoginForm()
 createRegisterForm()
 
 function createContainerBlock() {
-    return createDiv("flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container')
+    return createHtmlElement('div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container')
 }
 
 /**
+ * @param {string} tag Examples: 'div', 'a'
  * @param {string} classes
  * @param {string} id
- * @returns {HTMLDivElement}
+ * @param {string} innerText
+ * @returns {HTMLElement}
  */
-function createDiv(classes, id) {
-    let divBlock = document.createElement('div')
+function createHtmlElement(tag, classes, id = '', innerText = '') {
+    let divBlock = document.createElement(tag)
     addClassesToHtml(divBlock, classes)
 
     if (id) {
-        divBlock.setAttribute('id', 'container')
+        divBlock.setAttribute('id', id)
+    }
+
+    if (innerText) {
+        divBlock.innerText = innerText
     }
 
     document.body.append(divBlock)
@@ -98,10 +104,7 @@ function createRegisterForm() {
  * @returns {HTMLDivElement}
  */
 function createFormRootBlock(id) {
-    let rootBlock = document.createElement('div')
-    addClassesToHtml(rootBlock, "pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto")
-    rootBlock.setAttribute('id', id)
-    return rootBlock
+    return createHtmlElement('div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id)
 }
 
 /**
@@ -109,10 +112,7 @@ function createFormRootBlock(id) {
  * @returns {HTMLHeadingElement}
  */
 function createFormHeader(header) {
-    let h2Block = document.createElement('h2')
-    addClassesToHtml(h2Block, 'text-2xl font-bold')
-    h2Block.innerText = header
-    return h2Block
+    return createHtmlElement('h2', 'text-2xl font-bold', '', header)
 }
 
 /**
@@ -123,14 +123,9 @@ function createFormHeader(header) {
  */
 function createFormLabelBlock(labelText, inputType, id) {
 
-    let labelBlock = document.createElement('label')
-    labelBlock.classList.add('block')
-
-    let spanBlock = document.createElement('span')
-    spanBlock.classList.add('text-gray-700')
-    spanBlock.innerText = labelText
-
-    let inputBlock = getInputBlockForForm(inputType, id);
+    let labelBlock = createHtmlElement('label', 'block')
+    let spanBlock = createHtmlElement('span', 'text-gray-700', '', labelText)
+    let inputBlock = createInputBlockForForm(inputType, id);
 
     labelBlock.append(spanBlock, inputBlock)
 
@@ -142,12 +137,14 @@ function createFormLabelBlock(labelText, inputType, id) {
  * @param {string} id
  * @returns {HTMLLabelElement}
  */
-function getInputBlockForForm(inputType, id) {
+function createInputBlockForForm(inputType, id) {
     let inputBlock
 
     if (inputType === 'number') {
         inputBlock = document.createElement('textarea')
         inputBlock.setAttribute('rows', '2')
+        inputBlock.setAttribute('min', '0')
+        inputBlock.setAttribute('step', '0.01')
     } else {
         inputBlock = document.createElement('input')
         inputBlock.setAttribute('type', inputType)
@@ -158,11 +155,6 @@ function getInputBlockForForm(inputType, id) {
     inputBlock.setAttribute('id', id)
     inputBlock.setAttribute('required', '')
 
-    if (inputType === 'number') {
-        inputBlock.setAttribute('min', '0')
-        inputBlock.setAttribute('step', '0.01')
-    }
-
     return inputBlock;
 }
 
@@ -172,12 +164,11 @@ function getInputBlockForForm(inputType, id) {
  * @returns {HTMLButtonElement}
  */
 function createFormButton(text, buttonId) {
-
-    let buttonBlock = document.createElement('button')
-    addClassesToHtml(buttonBlock, "text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800")
+    let buttonBlock = createHtmlElement('button',
+        'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
+        buttonId,
+        text)
     buttonBlock.setAttribute('type', 'button')
-    buttonBlock.setAttribute('id', buttonId)
-    buttonBlock.innerText = text
     return buttonBlock
 }
 
@@ -188,9 +179,7 @@ function createFormButton(text, buttonId) {
  * @returns {HTMLAnchorElement}
  */
 function createAnotherFormLink(text, currentFormId, anotherFormId) {
-    let linkBlock = document.createElement('a')
-    addClassesToHtml(linkBlock, 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline')
-    linkBlock.innerText = text
+    let linkBlock = createHtmlElement('a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text)
     linkBlock.onclick = function () {
         document.getElementById(currentFormId).style.display = 'none'
         document.getElementById(anotherFormId).style.display = 'grid'
@@ -203,10 +192,7 @@ function createAnotherFormLink(text, currentFormId, anotherFormId) {
  * @returns {HTMLHeadingElement}
  */
 function createHeader(text) {
-    let headerBlock = document.createElement('h1')
-    addClassesToHtml(headerBlock, 'text-3xl font-bold underline mx-auto my-5')
-    headerBlock.innerText = text
-    return headerBlock
+    return createHtmlElement('h1', 'text-3xl font-bold underline mx-auto my-5', '', text)
 }
 
 /**
