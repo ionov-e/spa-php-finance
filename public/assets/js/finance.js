@@ -63,8 +63,34 @@ async function sendData(inputIds) {
     return await response.json()
 }
 
-function showList() {
-    // #TODO fill
+async function askList() {
+    let response = await fetch('/', {
+        headers: {'Content-Type': 'application/json;charset=utf-8'},
+    });
+
+    let decodedResponse = await response.json() // success or error
+
+    if (decodedResponse.status === STATUS_ERROR) {
+        return alert(decodedResponse.message)
+    }
+
+    if (decodedResponse.status !== STATUS_SUCCESS) {
+        return alert('Unexpected error')
+    }
+    return showList(decodedResponse.data['articles'])
+}
+
+/**
+ * @param {Array.<{id: Number, is_income: boolean, amount: Number, comment: String}>} articles
+ */
+function showList(articles) {
+
+    if (articles.length === 0) {
+        return alert('There are no articles in DB')
+    }
+
+    containerBlock.remove()
+    containerBlock = createContainerBlock()
 }
 
 function processLoginAndRegisterResponse(result) { // success or fail
