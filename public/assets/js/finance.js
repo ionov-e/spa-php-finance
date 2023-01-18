@@ -1,3 +1,4 @@
+const CHECKBOX_ALL_ID = 'checkbox-all-search';
 let containerBlock = createContainerBlock();
 createLoginForm();
 createRegisterForm();
@@ -12,22 +13,30 @@ function createContainerBlock() {
  * @param {string} classes
  * @param {string} id
  * @param {string} innerText
+ * @param {Object} attributes Example {'type': 'checkbox', 'required': ''}
  * @returns {HTMLElement}
  */
-function createHtmlElement(rootElement, tag, classes, id = '', innerText = '') {
-    let divBlock = document.createElement(tag);
-    addClassesToHtml(divBlock, classes);
+function createHtmlElement(rootElement, tag, classes = '', id = '', innerText = '', attributes = []) {
+    let htmlElement = document.createElement(tag);
+
+    if (classes) {
+        addClassesToHtml(htmlElement, classes);
+    }
 
     if (id) {
-        divBlock.setAttribute('id', id);
+        htmlElement.setAttribute('id', id);
     }
 
     if (innerText) {
-        divBlock.innerText = innerText;
+        htmlElement.innerText = innerText;
     }
 
-    rootElement.append(divBlock);
-    return divBlock;
+    for (const [key, value] of Object.entries(attributes)) {
+        htmlElement.setAttribute(key, value);
+    }
+
+    rootElement.append(htmlElement);
+    return htmlElement;
 }
 
 function createLoginForm() {
@@ -99,7 +108,6 @@ function processLoginAndRegisterResponse(result) { // success or fail
     }
 
     alert('Unexpected answer from server');
-
 }
 
 function createRegisterForm() {
@@ -188,14 +196,12 @@ function createInputBlockForForm(rootElement, inputType, id) {
  * @returns {HTMLButtonElement}
  */
 function createFormButton(rootElement, text, buttonId) {
-    let buttonBlock = createHtmlElement(rootElement,
+    return createHtmlElement(rootElement,
         'button',
         'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
         buttonId,
-        text);
-    buttonBlock.setAttribute('type', 'button');
-    rootElement.append(buttonBlock);
-    return buttonBlock;
+        text,
+        {'type': 'button'});
 }
 
 /**
@@ -212,7 +218,6 @@ function createAnotherFormLink(rootElement, text, currentFormId, anotherFormId) 
         document.getElementById(currentFormId).style.display = 'none';
         document.getElementById(anotherFormId).style.display = 'grid';
     }
-    rootElement.append(linkBlock);
     return linkBlock;
 }
 
