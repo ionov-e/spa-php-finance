@@ -198,7 +198,7 @@ function createInputBlockForForm(rootElement, inputType, id) {
 function createFormButton(rootElement, text, buttonId) {
     return createHtmlElement(rootElement,
         'button',
-        'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
+        'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3',
         buttonId,
         text,
         {'type': 'button'});
@@ -213,7 +213,7 @@ function createFormButton(rootElement, text, buttonId) {
  */
 function createAnotherFormLink(rootElement, text, currentFormId, anotherFormId) {
     let linkBlock = createHtmlElement(rootElement,
-        'a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text);
+        'a', 'font-medium text-blue-600 text-right hover:underline cursor-pointer', '', text);
     linkBlock.onclick = function () {
         document.getElementById(currentFormId).style.display = 'none';
         document.getElementById(anotherFormId).style.display = 'grid';
