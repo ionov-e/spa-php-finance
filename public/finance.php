@@ -17,6 +17,7 @@ use \App\Services\Response;
 
 <script src="https://unpkg.com/flowbite@1.5.5/dist/flowbite.js"></script>
 <script>
+    const OPERATION_ID_KEY_NAME = '<?= OPERATION_ID_KEY_NAME ?>'
     const LOGIN_FORM_ID = 'login-form'
     const REGISTER_FORM_ID = 'register-form'
     const LOGIN_BUTTON_ID = 'login-button'

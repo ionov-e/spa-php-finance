@@ -1,4 +1,7 @@
+const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
 const CHECKBOX_ALL_ID = 'checkbox-all-search';
+const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
+const DEFAULT_TD_CLASSES = "p-4 px-6";
 let containerBlock = createContainerBlock();
 createLoginForm();
 createRegisterForm();
@@ -49,11 +52,11 @@ function createLoginForm() {
     createAnotherFormLink(formBlock, 'Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
 
     buttonBlock.onclick = function () {
-        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(result => processLoginAndRegisterResponse(result));
+        fetchUserData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(result => processResponse(result, askList));
     }
 }
 
-async function sendData(inputIds) {
+async function fetchUserData(inputIds) {
     let inputData = {};
 
     inputIds.forEach((id) => {
@@ -64,6 +67,18 @@ async function sendData(inputIds) {
         method: 'POST',
         headers: {'Content-Type': 'application/json;charset=utf-8'},
         body: JSON.stringify(inputData)
+    });
+
+    return await response.json();
+}
+
+/**
+ * @param {number} id
+ * @returns {Promise<any>}
+ */
+async function fetchSingleOperation(id) {
+    let response = await fetch(OPERATION_LINK_PREFIX + id, {
+        headers: {'Content-Type': 'application/json;charset=utf-8'}
     });
 
     return await response.json();
@@ -86,9 +101,7 @@ async function askList() {
     return showList(decodedResponse.data['operations']);
 }
 
-/**
- * @param {Array.<{id: number, is_income: boolean, amount: number, comment: string}>} articles
- */
+/** @param {Array.<{id: number, is_income: boolean, amount: number, comment: string}>} operations */
 function showList(operations) {
 
     if (operations.length === 0) {
@@ -97,12 +110,43 @@ function showList(operations) {
 
     containerBlock.remove();
     containerBlock = createContainerBlock();
+
+    let tableBlock = createHtmlElement(containerBlock, 'table', "w-full");
+    let theadBlock = createHtmlElement(tableBlock, 'thead', "text-xs text-gray-700 uppercase bg-gray-50 text-left");
+    let trHeadBlock = createHtmlElement(theadBlock, 'tr');
+
+    let thCheckboxBlock = createHtmlElement(trHeadBlock, 'th', "p-4", '', '', {'scope': 'col'});
+    createCheckboxForTableBlock(thCheckboxBlock, CHECKBOX_ALL_ID);
+    createThForTable(trHeadBlock, 'ID');
+    createThForTable(trHeadBlock, 'Amount');
+    createThForTable(trHeadBlock, 'Comment');
+    createThForTable(trHeadBlock, 'Type');
+    createThForTable(trHeadBlock, 'Action');
+
+    let tbodyBlock = createHtmlElement(tableBlock, 'tbody', "border-b bg-white text-gray-500 text-sm");
+
+    operations.forEach((operation) => {
+        let trBlock = createHtmlElement(tbodyBlock, 'tr', "hover:bg-gray-50");
+
+        let tdForCheckboxBlock = createHtmlElement(trBlock, 'td', "p-4 w-4");
+        createCheckboxForTableBlock(tdForCheckboxBlock, CHECKBOX_PREFIX_ID + operation.id);
+        createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.id);
+        createTdForAmount(trBlock, operation.amount, operation.is_income)
+        createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.comment);
+        createTdForType(trBlock, operation.is_income);
+        createTdForLink(trBlock, operation.id);
+    })
 }
 
-function processLoginAndRegisterResponse(result) { // success or fail
+/** @param {Array.<id: number, is_income: boolean, amount: number, comment: string>} operation */
+function showOperation(operation) {
+    // #TODO Show Operation
+}
+
+function processResponse(result, successCallback) { // success or fail
 
     if (result.status === STATUS_SUCCESS) {
-        return askList();
+        return successCallback(result);
     } else if (result.status === STATUS_FAIL) {
         return alert(result.data[NOTIFICATION]);
     }
@@ -123,7 +167,7 @@ function createRegisterForm() {
     formBlock.style.display = 'none';
 
     buttonBlock.onclick = function () {
-        sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(r => processLoginAndRegisterResponse(r));
+        fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askList));
     }
 }
 
@@ -152,7 +196,6 @@ function createFormHeader(rootElement, header) {
  * @returns {HTMLLabelElement}
  */
 function createFormLabelBlock(rootElement, labelText, inputType, id) {
-
     let labelBlock = createHtmlElement(rootElement, 'label', 'block');
     createHtmlElement(labelBlock, 'span', 'text-gray-700', '', labelText);
     createInputBlockForForm(labelBlock, inputType, id);
@@ -219,6 +262,67 @@ function createAnotherFormLink(rootElement, text, currentFormId, anotherFormId) 
         document.getElementById(anotherFormId).style.display = 'grid';
     }
     return linkBlock;
+}
+
+/**
+ * @param {HTMLElement} rootElement
+ * @param {string} text
+ * @param {string} classes
+ * @returns {HTMLElement}
+ */
+function createThForTable(rootElement, text, classes = "py-3 px-6") {
+    return createHtmlElement(rootElement, 'th', classes, '', text, {'scope': 'col'});
+}
+
+function createCheckboxForTableBlock(rootBlock, id) {
+    let divBlock = createHtmlElement(rootBlock, 'div', "flex items-center");
+    createHtmlElement(divBlock, 'input', "w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2", id, '', {'type': 'checkbox'});
+    createHtmlElement(divBlock, 'label', "sr-only", '', 'checkbox', {'for': id});
+}
+
+/**
+ * @param {HTMLElement} rootBlock
+ * @param {number} amount
+ * @param {boolean} isIncome
+ * @returns {HTMLElement}
+ */
+function createTdForAmount(rootBlock, amount, isIncome) {
+    let tdForAmountBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
+    if (isIncome) {
+        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-green-500", '', '+' + amount.toFixed(2));
+    } else {
+        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-red-500", '', '-' + amount.toFixed(2));
+    }
+    return tdForAmountBlock;
+}
+
+/**
+ * @param {HTMLElement} rootBlock
+ * @param {boolean} isIncome
+ * @returns {HTMLElement}
+ */
+function createTdForType(rootBlock, isIncome) {
+    let typeOfTdBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
+    let divBlock = createHtmlElement(typeOfTdBlock, 'div', "flex items-center");
+    createHtmlElement(divBlock,
+        'span',
+        isIncome ? "h-2.5 w-2.5 rounded-full bg-green-500 mr-2" : "h-2.5 w-2.5 rounded-full bg-red-500 mr-2");
+    createHtmlElement(divBlock, 'span', '', '', isIncome ? 'Income' : 'Expense');
+    return typeOfTdBlock;
+}
+
+/**
+ * @param {HTMLElement} rootBlock
+ * @param {int} id
+ * @returns {HTMLElement}
+ */
+function createTdForLink(rootBlock, id) {
+    let tdBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
+    let buttonBlock = createHtmlElement(tdBlock, 'button', "font-medium text-blue-600 hover:underline", '', 'View');
+    buttonBlock.onclick = function () {
+        fetchSingleOperation(id).then(result => processResponse(result, showOperation));
+    }
+    return tdBlock;
 }
 
 /**
