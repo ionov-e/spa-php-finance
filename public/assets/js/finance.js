@@ -83,16 +83,16 @@ async function askList() {
     if (decodedResponse.status !== STATUS_SUCCESS) {
         return alert('Unexpected error');
     }
-    return showList(decodedResponse.data['articles']);
+    return showList(decodedResponse.data['operations']);
 }
 
 /**
  * @param {Array.<{id: number, is_income: boolean, amount: number, comment: string}>} articles
  */
-function showList(articles) {
+function showList(operations) {
 
-    if (articles.length === 0) {
-        return alert('There are no articles in DB');
+    if (operations.length === 0) {
+        return alert('There are no operations in DB');
     }
 
     containerBlock.remove();

@@ -21,7 +21,7 @@ class Operation
 
         try {
             $operations = $this->db->getOperations();
-            Response::success(['articles' => $operations]);
+            Response::success(['operations' => $operations]);
         } catch (\Exception $e) {
             Log::error("Exception: {$e->getMessage()}");
             Response::error('Unforeseen error');
@@ -36,7 +36,7 @@ class Operation
         try {
             $query = Input::getQueryFromGet();
             $operations = $this->db->getOperationsByQuery($query);
-            Response::success(['articles' => $operations, 'query' => $query, 'count' => count($operations)]);
+            Response::success(['operations' => $operations, 'query' => $query, 'count' => count($operations)]);
         } catch (\Exception $e) {
             Log::error("Exception: {$e->getMessage()}");
             Response::error('Unforeseen error');
