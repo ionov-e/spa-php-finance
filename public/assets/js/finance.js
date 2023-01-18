@@ -3,17 +3,18 @@ createLoginForm();
 createRegisterForm();
 
 function createContainerBlock() {
-    return createHtmlElement('div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container');
+    return createHtmlElement(document.body, 'div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container');
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} tag Examples: 'div', 'a'
  * @param {string} classes
  * @param {string} id
  * @param {string} innerText
  * @returns {HTMLElement}
  */
-function createHtmlElement(tag, classes, id = '', innerText = '') {
+function createHtmlElement(rootElement, tag, classes, id = '', innerText = '') {
     let divBlock = document.createElement(tag);
     addClassesToHtml(divBlock, classes);
 
@@ -25,26 +26,22 @@ function createHtmlElement(tag, classes, id = '', innerText = '') {
         divBlock.innerText = innerText;
     }
 
-    document.body.append(divBlock);
+    rootElement.append(divBlock);
     return divBlock;
 }
 
 function createLoginForm() {
-    let rootBlock = createFormRootBlock(LOGIN_FORM_ID);
+    let formBlock = createFormRootBlock(LOGIN_FORM_ID);
 
-    let headerBlock = createFormHeader('Login');
-    let loginInputBlock = createFormLabelBlock('Login', 'text', LOGIN_LOGIN_ID);
-    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_LOGIN_ID);
-    let buttonBlock = createFormButton('Login', LOGIN_BUTTON_ID);
-    let anotherFormLink = createAnotherFormLink('Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
+    createFormHeader(formBlock, 'Login');
+    createFormLabelBlock(formBlock, 'Login', 'text', LOGIN_LOGIN_ID);
+    createFormLabelBlock(formBlock, 'Password', 'password', PASSWORD_FOR_LOGIN_ID);
+    let buttonBlock = createFormButton(formBlock, 'Login', LOGIN_BUTTON_ID);
+    createAnotherFormLink(formBlock, 'Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
 
     buttonBlock.onclick = function () {
-        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(r => processLoginAndRegisterResponse(r));
+        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(result => processLoginAndRegisterResponse(result));
     }
-
-    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, buttonBlock, anotherFormLink);
-
-    containerBlock.append(rootBlock);
 }
 
 async function sendData(inputIds) {
@@ -106,23 +103,20 @@ function processLoginAndRegisterResponse(result) { // success or fail
 }
 
 function createRegisterForm() {
-    let rootBlock = createFormRootBlock(REGISTER_FORM_ID);
+    let formBlock = createFormRootBlock(REGISTER_FORM_ID);
 
-    let headerBlock = createFormHeader('Register');
-    let loginInputBlock = createFormLabelBlock('Login', 'text', REGISTER_LOGIN_ID);
-    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_REGISTER_ID);
-    let passwordRepeatInputBlock = createFormLabelBlock('Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID);
-    let buttonBlock = createFormButton('Register', REGISTER_BUTTON_ID);
-    let anotherFormLink = createAnotherFormLink('Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID);
+    createFormHeader(formBlock, 'Register');
+    createFormLabelBlock(formBlock, 'Login', 'text', REGISTER_LOGIN_ID);
+    createFormLabelBlock(formBlock, 'Password', 'password', PASSWORD_FOR_REGISTER_ID);
+    createFormLabelBlock(formBlock, 'Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID);
+    let buttonBlock = createFormButton(formBlock, 'Register', REGISTER_BUTTON_ID);
+    createAnotherFormLink(formBlock, 'Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID);
 
-    rootBlock.style.display = 'none';
-    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, passwordRepeatInputBlock, buttonBlock, anotherFormLink);
+    formBlock.style.display = 'none';
 
     buttonBlock.onclick = function () {
         sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(r => processLoginAndRegisterResponse(r));
     }
-
-    containerBlock.append(rootBlock);
 }
 
 /**
@@ -130,40 +124,41 @@ function createRegisterForm() {
  * @returns {HTMLDivElement}
  */
 function createFormRootBlock(id) {
-    return createHtmlElement('div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id);
+    return createHtmlElement(containerBlock, 'div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id);
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} header
  * @returns {HTMLHeadingElement}
  */
-function createFormHeader(header) {
-    return createHtmlElement('h2', 'text-2xl font-bold', '', header);
+function createFormHeader(rootElement, header) {
+    return createHtmlElement(rootElement, 'h2', 'text-2xl font-bold', '', header);
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} labelText
  * @param {string} inputType
  * @param {string} id
  * @returns {HTMLLabelElement}
  */
-function createFormLabelBlock(labelText, inputType, id) {
+function createFormLabelBlock(rootElement, labelText, inputType, id) {
 
-    let labelBlock = createHtmlElement('label', 'block');
-    let spanBlock = createHtmlElement('span', 'text-gray-700', '', labelText);
-    let inputBlock = createInputBlockForForm(inputType, id);
-
-    labelBlock.append(spanBlock, inputBlock);
+    let labelBlock = createHtmlElement(rootElement, 'label', 'block');
+    createHtmlElement(labelBlock, 'span', 'text-gray-700', '', labelText);
+    createInputBlockForForm(labelBlock, inputType, id);
 
     return labelBlock;
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} inputType
  * @param {string} id
  * @returns {HTMLLabelElement}
  */
-function createInputBlockForForm(inputType, id) {
+function createInputBlockForForm(rootElement, inputType, id) {
     let inputBlock
 
     if (inputType === 'number') {
@@ -181,44 +176,53 @@ function createInputBlockForForm(inputType, id) {
     inputBlock.setAttribute('id', id);
     inputBlock.setAttribute('required', '');
 
+    rootElement.append(inputBlock);
+
     return inputBlock;
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} text
  * @param {string} buttonId
  * @returns {HTMLButtonElement}
  */
-function createFormButton(text, buttonId) {
-    let buttonBlock = createHtmlElement('button',
+function createFormButton(rootElement, text, buttonId) {
+    let buttonBlock = createHtmlElement(rootElement,
+        'button',
         'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
         buttonId,
         text);
     buttonBlock.setAttribute('type', 'button');
+    rootElement.append(buttonBlock);
     return buttonBlock;
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} text
  * @param {string} currentFormId
  * @param {string} anotherFormId
  * @returns {HTMLAnchorElement}
  */
-function createAnotherFormLink(text, currentFormId, anotherFormId) {
-    let linkBlock = createHtmlElement('a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text);
+function createAnotherFormLink(rootElement, text, currentFormId, anotherFormId) {
+    let linkBlock = createHtmlElement(rootElement,
+        'a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text);
     linkBlock.onclick = function () {
         document.getElementById(currentFormId).style.display = 'none';
         document.getElementById(anotherFormId).style.display = 'grid';
     }
+    rootElement.append(linkBlock);
     return linkBlock;
 }
 
 /**
+ * @param {HTMLElement} rootElement
  * @param {string} text
  * @returns {HTMLHeadingElement}
  */
-function createHeader(text) {
-    return createHtmlElement('h1', 'text-3xl font-bold underline mx-auto my-5', '', text);
+function createHeader(rootElement, text) {
+    return createHtmlElement(rootElement, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', text);
 }
 
 /**
