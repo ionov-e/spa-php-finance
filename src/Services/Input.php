@@ -32,11 +32,14 @@ class Input
 
         Log::debug("Operation ID received: {$operationId}");
 
-        switch (true) {
-            case is_numeric(trim($operationId)):
-            case $operationId = (int)$operationId:
-            case $operationId <= 0:
-                throw new UnexpectedValueException($defaultErrorMessage);
+        if (!is_numeric(trim($operationId))) {
+            throw new UnexpectedValueException($defaultErrorMessage);
+        }
+
+        $operationId = (int)$operationId;
+
+        if ($operationId <= 0) {
+            throw new UnexpectedValueException($defaultErrorMessage);
         }
 
         return $operationId;

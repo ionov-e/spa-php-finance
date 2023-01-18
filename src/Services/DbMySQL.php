@@ -40,7 +40,7 @@ class DbMySQL implements DbInterface
         $sql = "SELECT * FROM operations WHERE id = :id";
         $sth = $this->pdo->prepare($sql, [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]);
         $sth->execute(['id' => $operationId]);
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        return $sth->fetch(PDO::FETCH_ASSOC);
     }
 
     public function register(string $login, string $password): int

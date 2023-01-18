@@ -34,6 +34,8 @@ if (empty($_SESSION[AUTHENTICATED_USER_ID])) {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     switch (true) { // Every method returns never
+        case !empty($_GET[OPERATION_ID_KEY_NAME]):
+            (new Controllers\Operation(new DbMySQL()))->showByID();
         case !empty($_GET[SEARCH_KEY_NAME]):
             (new Controllers\Operation(new DbMySQL()))->listFilteredByQuery();
         default:
