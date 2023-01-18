@@ -1,9 +1,9 @@
-let containerBlock = createContainerBlock()
-createLoginForm()
-createRegisterForm()
+let containerBlock = createContainerBlock();
+createLoginForm();
+createRegisterForm();
 
 function createContainerBlock() {
-    return createHtmlElement('div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container')
+    return createHtmlElement('div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container');
 }
 
 /**
@@ -14,45 +14,45 @@ function createContainerBlock() {
  * @returns {HTMLElement}
  */
 function createHtmlElement(tag, classes, id = '', innerText = '') {
-    let divBlock = document.createElement(tag)
-    addClassesToHtml(divBlock, classes)
+    let divBlock = document.createElement(tag);
+    addClassesToHtml(divBlock, classes);
 
     if (id) {
-        divBlock.setAttribute('id', id)
+        divBlock.setAttribute('id', id);
     }
 
     if (innerText) {
-        divBlock.innerText = innerText
+        divBlock.innerText = innerText;
     }
 
-    document.body.append(divBlock)
-    return divBlock
+    document.body.append(divBlock);
+    return divBlock;
 }
 
 function createLoginForm() {
-    let rootBlock = createFormRootBlock(LOGIN_FORM_ID)
+    let rootBlock = createFormRootBlock(LOGIN_FORM_ID);
 
-    let headerBlock = createFormHeader('Login')
-    let loginInputBlock = createFormLabelBlock('Login', 'text', LOGIN_LOGIN_ID)
-    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_LOGIN_ID)
-    let buttonBlock = createFormButton('Login', LOGIN_BUTTON_ID)
-    let anotherFormLink = createAnotherFormLink('Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID)
+    let headerBlock = createFormHeader('Login');
+    let loginInputBlock = createFormLabelBlock('Login', 'text', LOGIN_LOGIN_ID);
+    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_LOGIN_ID);
+    let buttonBlock = createFormButton('Login', LOGIN_BUTTON_ID);
+    let anotherFormLink = createAnotherFormLink('Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
 
     buttonBlock.onclick = function () {
-        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(r => processLoginAndRegisterResponse(r))
+        sendData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(r => processLoginAndRegisterResponse(r));
     }
 
-    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, buttonBlock, anotherFormLink)
+    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, buttonBlock, anotherFormLink);
 
-    containerBlock.append(rootBlock)
+    containerBlock.append(rootBlock);
 }
 
 async function sendData(inputIds) {
-    let inputData = {}
+    let inputData = {};
 
     inputIds.forEach((id) => {
-        inputData[id] = document.getElementById(id).value
-    })
+        inputData[id] = document.getElementById(id).value;
+    });
 
     let response = await fetch('/', {
         method: 'POST',
@@ -60,7 +60,7 @@ async function sendData(inputIds) {
         body: JSON.stringify(inputData)
     });
 
-    return await response.json()
+    return await response.json();
 }
 
 async function askList() {
@@ -68,61 +68,61 @@ async function askList() {
         headers: {'Content-Type': 'application/json;charset=utf-8'},
     });
 
-    let decodedResponse = await response.json() // success or error
+    let decodedResponse = await response.json(); // success or error
 
     if (decodedResponse.status === STATUS_ERROR) {
-        return alert(decodedResponse.message)
+        return alert(decodedResponse.message);
     }
 
     if (decodedResponse.status !== STATUS_SUCCESS) {
-        return alert('Unexpected error')
+        return alert('Unexpected error');
     }
-    return showList(decodedResponse.data['articles'])
+    return showList(decodedResponse.data['articles']);
 }
 
 /**
- * @param {Array.<{id: Number, is_income: boolean, amount: Number, comment: String}>} articles
+ * @param {Array.<{id: number, is_income: boolean, amount: number, comment: string}>} articles
  */
 function showList(articles) {
 
     if (articles.length === 0) {
-        return alert('There are no articles in DB')
+        return alert('There are no articles in DB');
     }
 
-    containerBlock.remove()
-    containerBlock = createContainerBlock()
+    containerBlock.remove();
+    containerBlock = createContainerBlock();
 }
 
 function processLoginAndRegisterResponse(result) { // success or fail
 
     if (result.status === STATUS_SUCCESS) {
-        return askList()
+        return askList();
     } else if (result.status === STATUS_FAIL) {
-        return alert(result.data[NOTIFICATION])
+        return alert(result.data[NOTIFICATION]);
     }
 
-    alert('Unexpected answer from server')
+    alert('Unexpected answer from server');
 
 }
 
 function createRegisterForm() {
-    let rootBlock = createFormRootBlock(REGISTER_FORM_ID)
+    let rootBlock = createFormRootBlock(REGISTER_FORM_ID);
 
-    let headerBlock = createFormHeader('Register')
-    let loginInputBlock = createFormLabelBlock('Login', 'text', REGISTER_LOGIN_ID)
-    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_REGISTER_ID)
-    let passwordRepeatInputBlock = createFormLabelBlock('Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID)
-    let buttonBlock = createFormButton('Register', REGISTER_BUTTON_ID)
-    let anotherFormLink = createAnotherFormLink('Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID)
+    let headerBlock = createFormHeader('Register');
+    let loginInputBlock = createFormLabelBlock('Login', 'text', REGISTER_LOGIN_ID);
+    let passwordInputBlock = createFormLabelBlock('Password', 'password', PASSWORD_FOR_REGISTER_ID);
+    let passwordRepeatInputBlock = createFormLabelBlock('Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID);
+    let buttonBlock = createFormButton('Register', REGISTER_BUTTON_ID);
+    let anotherFormLink = createAnotherFormLink('Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID);
 
-    rootBlock.style.display = 'none'
-    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, passwordRepeatInputBlock, buttonBlock, anotherFormLink)
+    rootBlock.style.display = 'none';
+    rootBlock.append(headerBlock, loginInputBlock, passwordInputBlock, passwordRepeatInputBlock, buttonBlock, anotherFormLink);
 
     buttonBlock.onclick = function () {
-        sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(r => processLoginAndRegisterResponse(r))
+        sendData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(r => processLoginAndRegisterResponse(r));
     }
 
-    containerBlock.append(rootBlock)
+    containerBlock.append(rootBlock);
 }
 
 /**
@@ -130,7 +130,7 @@ function createRegisterForm() {
  * @returns {HTMLDivElement}
  */
 function createFormRootBlock(id) {
-    return createHtmlElement('div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id)
+    return createHtmlElement('div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id);
 }
 
 /**
@@ -138,7 +138,7 @@ function createFormRootBlock(id) {
  * @returns {HTMLHeadingElement}
  */
 function createFormHeader(header) {
-    return createHtmlElement('h2', 'text-2xl font-bold', '', header)
+    return createHtmlElement('h2', 'text-2xl font-bold', '', header);
 }
 
 /**
@@ -149,13 +149,13 @@ function createFormHeader(header) {
  */
 function createFormLabelBlock(labelText, inputType, id) {
 
-    let labelBlock = createHtmlElement('label', 'block')
-    let spanBlock = createHtmlElement('span', 'text-gray-700', '', labelText)
+    let labelBlock = createHtmlElement('label', 'block');
+    let spanBlock = createHtmlElement('span', 'text-gray-700', '', labelText);
     let inputBlock = createInputBlockForForm(inputType, id);
 
-    labelBlock.append(spanBlock, inputBlock)
+    labelBlock.append(spanBlock, inputBlock);
 
-    return labelBlock
+    return labelBlock;
 }
 
 /**
@@ -167,19 +167,19 @@ function createInputBlockForForm(inputType, id) {
     let inputBlock
 
     if (inputType === 'number') {
-        inputBlock = document.createElement('textarea')
-        inputBlock.setAttribute('rows', '2')
-        inputBlock.setAttribute('min', '0')
-        inputBlock.setAttribute('step', '0.01')
+        inputBlock = document.createElement('textarea');
+        inputBlock.setAttribute('rows', '2');
+        inputBlock.setAttribute('min', '0');
+        inputBlock.setAttribute('step', '0.01');
     } else {
-        inputBlock = document.createElement('input')
-        inputBlock.setAttribute('type', inputType)
+        inputBlock = document.createElement('input');
+        inputBlock.setAttribute('type', inputType);
     }
 
-    addClassesToHtml(inputBlock, "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black")
-    inputBlock.setAttribute('name', id)
-    inputBlock.setAttribute('id', id)
-    inputBlock.setAttribute('required', '')
+    addClassesToHtml(inputBlock, "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black");
+    inputBlock.setAttribute('name', id);
+    inputBlock.setAttribute('id', id);
+    inputBlock.setAttribute('required', '');
 
     return inputBlock;
 }
@@ -193,9 +193,9 @@ function createFormButton(text, buttonId) {
     let buttonBlock = createHtmlElement('button',
         'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
         buttonId,
-        text)
-    buttonBlock.setAttribute('type', 'button')
-    return buttonBlock
+        text);
+    buttonBlock.setAttribute('type', 'button');
+    return buttonBlock;
 }
 
 /**
@@ -205,12 +205,12 @@ function createFormButton(text, buttonId) {
  * @returns {HTMLAnchorElement}
  */
 function createAnotherFormLink(text, currentFormId, anotherFormId) {
-    let linkBlock = createHtmlElement('a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text)
+    let linkBlock = createHtmlElement('a', 'font-medium text-blue-600 text-right dark:text-blue-500 hover:underline cursor-pointer', '', text);
     linkBlock.onclick = function () {
-        document.getElementById(currentFormId).style.display = 'none'
-        document.getElementById(anotherFormId).style.display = 'grid'
+        document.getElementById(currentFormId).style.display = 'none';
+        document.getElementById(anotherFormId).style.display = 'grid';
     }
-    return linkBlock
+    return linkBlock;
 }
 
 /**
@@ -218,7 +218,7 @@ function createAnotherFormLink(text, currentFormId, anotherFormId) {
  * @returns {HTMLHeadingElement}
  */
 function createHeader(text) {
-    return createHtmlElement('h1', 'text-3xl font-bold underline mx-auto my-5', '', text)
+    return createHtmlElement('h1', 'text-3xl font-bold underline mx-auto my-5', '', text);
 }
 
 /**
@@ -226,6 +226,6 @@ function createHeader(text) {
  * @param {string} classes
  */
 function addClassesToHtml(htmlElement, classes) {
-    let classesArray = classes.split(' ')
-    htmlElement.classList.add(...classesArray)
+    let classesArray = classes.split(' ');
+    htmlElement.classList.add(...classesArray);
 }
