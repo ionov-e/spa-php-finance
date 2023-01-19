@@ -40,7 +40,7 @@ function createCleanContainerBlock() {
 
 /**
  * @param {HTMLElement} rootElement
- * @param {'div'|'span'|'a'|'button'|'p'|'input'|'label'|'h1'|'h2'|'h3'|'h4'|'h5'|'table'|'thead'|'tbody'|'th'|'tr'|'td'|'svg'|'path'} tag
+ * @param {'div'|'span'|'a'|'button'|'p'|'input'|'label'|'h1'|'h2'|'h3'|'h4'|'h5'|'table'|'thead'|'tbody'|'tfoot'|'th'|'tr'|'td'|'svg'|'path'} tag
  * @param {string} classes
  * @param {string} id
  * @param {string} innerText
@@ -148,7 +148,7 @@ async function askForList() {
  * @param {Array.<OperationArray>} operations
  * @param {String} title
  */
-function showList(operations, title = 'Operation List') {
+function showList(operations, title = 'Last 10 operations:') {
 
     if (operations.length === 0) {
         return alert('There are no operations in DB');
@@ -196,6 +196,9 @@ function showList(operations, title = 'Operation List') {
 
     let tbodyBlock = createHtmlElement(tableBlock, 'tbody', "border-b bg-white text-gray-500 text-sm");
 
+    let totalExpense = 0;
+    let totalIncome = 0;
+
     operations.forEach((operation) => {
         let trBlock = createHtmlElement(tbodyBlock, 'tr', "hover:bg-gray-50");
 
@@ -206,7 +209,23 @@ function showList(operations, title = 'Operation List') {
         createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.comment);
         createTdForType(trBlock, operation.is_income);
         createTdForLink(trBlock, operation.id);
+
+        if (operation.is_income) {
+            totalIncome += operation.amount;
+        } else {
+            totalExpense += operation.amount;
+        }
     })
+
+    let tfootTotalBlock = createHtmlElement(tableBlock, 'tfoot', "border-b bg-white text-gray-500 text-sm");
+    let trTotalBlock = createHtmlElement(tfootTotalBlock, 'tr', "bg-gray-50");
+    let thTotalBlock = createHtmlElement(trTotalBlock, 'th', "p-4 px-6", '', '', {'colspan': '6'});
+    let divIncomeBlock = createHtmlElement(thTotalBlock, 'div');
+    createHtmlElement(divIncomeBlock, 'span', 'pr-1', '', 'Total income:');
+    createHtmlElement(divIncomeBlock, 'span', 'text-green-500', '', totalIncome.toFixed(2));
+    let divExpenseBlock = createHtmlElement(thTotalBlock, 'div');
+    createHtmlElement(divExpenseBlock, 'span', 'pr-1', '', 'Total expense:');
+    createHtmlElement(divExpenseBlock, 'span', 'text-red-500', '', totalExpense.toFixed(2));
 }
 
 /** @param {OperationArray} operation */
