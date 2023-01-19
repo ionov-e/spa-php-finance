@@ -28,5 +28,5 @@ Front-end:
 6. `chmod 775 logs/`
 7. `sudo chown :www-data logs`
 8. Visit http://localhost:55000/finance.php
-9. You can login with **test** both as login and password. Or register a new user
+9. You can log in with **test** both as login and password. Or register a new user
 
