@@ -20,7 +20,7 @@ class Operation
         Log::init('opList');
 
         try {
-            $operations = $this->db->getOperations();
+            $operations = $this->db->getLastTenOperations();
             Response::success(['operations' => $operations]);
         } catch (\Exception $e) {
             Log::error("Exception: {$e->getMessage()}");

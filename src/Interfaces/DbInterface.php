@@ -13,7 +13,7 @@ interface DbInterface
     const RESULT_ERROR = 8;
     const RESULT_EXCEPTION = 9;
 
-    public function getOperations(): array;
+    public function getLastTenOperations(): array;
 
     public function getOperationsByQuery(string $query): array;
 

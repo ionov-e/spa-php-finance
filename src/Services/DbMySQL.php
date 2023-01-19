@@ -22,9 +22,9 @@ class DbMySQL implements DbInterface
         }
     }
 
-    public function getOperations(): array
+    public function getLastTenOperations(): array
     {
-        return $this->pdo->query("SELECT * FROM operations")->fetchAll(PDO::FETCH_ASSOC);
+        return $this->pdo->query("SELECT * FROM operations ORDER BY id DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getOperationsByQuery(string $query): array

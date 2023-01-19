@@ -144,8 +144,11 @@ async function askForList() {
     return showList(decodedResponse.data['operations']);
 }
 
-/** @param {Array.<OperationArray>} operations */
-function showList(operations) {
+/**
+ * @param {Array.<OperationArray>} operations
+ * @param {String} title
+ */
+function showList(operations, title = 'Operation List') {
 
     if (operations.length === 0) {
         return alert('There are no operations in DB');
@@ -177,7 +180,7 @@ function showList(operations) {
         return alert('Unexpected error');
     }
 
-    createHtmlElement(containerBlock, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', 'Operation List');
+    createHtmlElement(containerBlock, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', title);
 
     let tableBlock = createHtmlElement(containerBlock, 'table', "w-full");
     let theadBlock = createHtmlElement(tableBlock, 'thead', "text-xs text-gray-700 uppercase bg-gray-50 text-left");
