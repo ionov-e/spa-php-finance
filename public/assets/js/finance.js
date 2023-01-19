@@ -1,15 +1,3 @@
-const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
-const OPERATION_MODAL_ID = 'operationModal';
-const OPERATION_ID_PREFIX = 'single-operation-';
-const OPERATION_ID_ID = OPERATION_ID_PREFIX + 'id';
-const OPERATION_TYPE_ID = OPERATION_ID_PREFIX + 'type';
-const OPERATION_AMOUNT_ID = OPERATION_ID_PREFIX + 'amount';
-const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + 'comment';
-const CHECKBOX_ALL_ID = 'checkbox-all-search';
-const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
-const DEFAULT_TD_CLASSES = "p-4 px-6";
-let containerBlock = createContainerBlock();
-
 /**
  * @typedef ResponseJson
  * @type {object}
@@ -24,9 +12,22 @@ let containerBlock = createContainerBlock();
  * @property {number} amount
  * @property {string} comment
  */
+
+const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
+const OPERATION_MODAL_ID = 'operationModal';
+const OPERATION_ID_PREFIX = 'single-operation-';
+const OPERATION_ID_ID = OPERATION_ID_PREFIX + 'id';
+const OPERATION_TYPE_ID = OPERATION_ID_PREFIX + 'type';
+const OPERATION_AMOUNT_ID = OPERATION_ID_PREFIX + 'amount';
+const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + 'comment';
+const CHECKBOX_ALL_ID = 'checkbox-all-search';
+const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
+const DEFAULT_TD_CLASSES = "p-4 px-6";
+let containerBlock = createContainerBlock();
 createLoginForm();
 createRegisterForm();
 
+/** @returns {HTMLElement} */
 function createContainerBlock() {
     return createHtmlElement(document.body, 'div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container');
 }
