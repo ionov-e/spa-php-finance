@@ -16,10 +16,10 @@
 const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
 const OPERATION_MODAL_ID = 'operationModal';
 const OPERATION_ID_PREFIX = 'single-operation-';
-const OPERATION_ID_ID = OPERATION_ID_PREFIX + 'id';
+const OPERATION_ID_ID = OPERATION_ID_PREFIX + ID_KEY_NAME;
 const OPERATION_TYPE_ID = OPERATION_ID_PREFIX + 'type';
-const OPERATION_AMOUNT_ID = OPERATION_ID_PREFIX + 'amount';
-const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + 'comment';
+const OPERATION_AMOUNT_ID = OPERATION_ID_PREFIX + AMOUNT_KEY_NAME;
+const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + COMMENT_KEY_NAME;
 const CHECKBOX_ALL_ID = 'checkbox-all-search';
 const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
 const DEFAULT_TD_CLASSES = "p-4 px-6";
@@ -156,29 +156,9 @@ function showList(operations, title = 'Last 10 operations:') {
 
     let containerBlock = createCleanContainerBlock();
 
-    let logoutBlock = createHtmlElement(containerBlock,
+    let logoutLink = createHtmlElement(containerBlock,
         'a', 'font-medium text-blue-600 text-right hover:underline cursor-pointer', '', 'Logout');
-
-    logoutBlock.onclick = async function () {
-        let response = await fetch('/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json;charset=utf-8'},
-            body: JSON.stringify({[LOGOUT_KEY_NAME]: 'logout'})
-        });
-
-        /** @type {ResponseJson} */
-        let decodedResponse = await response.json();
-
-        if (decodedResponse.status === STATUS_SUCCESS) {
-            return createUnauthenticatedForms();
-        }
-
-        if (decodedResponse.status === STATUS_ERROR) {
-            return alert(decodedResponse.message);
-        }
-
-        return alert('Unexpected error');
-    }
+    logoutLink.onclick = logout;
 
     createHtmlElement(containerBlock, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', title);
 
@@ -226,6 +206,27 @@ function showList(operations, title = 'Last 10 operations:') {
     let divExpenseBlock = createHtmlElement(thTotalBlock, 'div');
     createHtmlElement(divExpenseBlock, 'span', 'pr-1', '', 'Total expense:');
     createHtmlElement(divExpenseBlock, 'span', 'text-red-500', '', totalExpense.toFixed(2));
+}
+
+async function logout () {
+    let response = await fetch('/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json;charset=utf-8'},
+        body: JSON.stringify({[LOGOUT_KEY_NAME]: 'logout'})
+    });
+
+    /** @type {ResponseJson} */
+    let decodedResponse = await response.json();
+
+    if (decodedResponse.status === STATUS_SUCCESS) {
+        return createUnauthenticatedForms();
+    }
+
+    if (decodedResponse.status === STATUS_ERROR) {
+        return alert(decodedResponse.message);
+    }
+
+    return alert('Unexpected error');
 }
 
 /** @param {OperationArray} operation */
@@ -377,27 +378,23 @@ function createFormLabelBlock(rootElement, labelText, inputType, id) {
  * @param {HTMLElement} rootElement
  * @param {string} inputType
  * @param {string} id
- * @returns {HTMLLabelElement}
+ * @returns {HTMLInputElement}
  */
 function createInputBlockForForm(rootElement, inputType, id) {
-    let inputBlock
+    let inputBlock = createHtmlElement(
+        rootElement,
+        'input',
+        "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black",
+        id,
+        '',
+        {'type': inputType, 'name': id, 'required': ''}
+    )
 
     if (inputType === 'number') {
-        inputBlock = document.createElement('textarea');
         inputBlock.setAttribute('rows', '2');
         inputBlock.setAttribute('min', '0');
         inputBlock.setAttribute('step', '0.01');
-    } else {
-        inputBlock = document.createElement('input');
-        inputBlock.setAttribute('type', inputType);
     }
-
-    addClassesToHtml(inputBlock, "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black");
-    inputBlock.setAttribute('name', id);
-    inputBlock.setAttribute('id', id);
-    inputBlock.setAttribute('required', '');
-
-    rootElement.append(inputBlock);
 
     return inputBlock;
 }
