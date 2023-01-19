@@ -2,7 +2,7 @@
 ## Description
 
 Specifics:
-- Simple SPA page
+- Simple SPA page using Vanilla JS, database and PHP with no frameworks
 - Operations list (income/expense) with last 10 entities
 - Possibility to create new operation
 - Possibility to view/delete specific operation
