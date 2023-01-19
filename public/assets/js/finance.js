@@ -1,8 +1,29 @@
 const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
+const OPERATION_MODAL_ID = 'operationModal';
+const OPERATION_ID_PREFIX = 'single-operation-';
+const OPERATION_ID_ID = OPERATION_ID_PREFIX + 'id';
+const OPERATION_TYPE_ID = OPERATION_ID_PREFIX + 'type';
+const OPERATION_AMOUNT_ID = OPERATION_ID_PREFIX + 'amount';
+const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + 'comment';
 const CHECKBOX_ALL_ID = 'checkbox-all-search';
 const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
 const DEFAULT_TD_CLASSES = "p-4 px-6";
 let containerBlock = createContainerBlock();
+
+/**
+ * @typedef ResponseJson
+ * @type {object}
+ * @property {string} status
+ * @property {string} message
+ * @property {Array} data
+
+ * @typedef OperationArray
+ * @type {Array}
+ * @property {number} id
+ * @property {boolean} is_income
+ * @property {number} amount
+ * @property {string} comment
+ */
 createLoginForm();
 createRegisterForm();
 
@@ -12,14 +33,14 @@ function createContainerBlock() {
 
 /**
  * @param {HTMLElement} rootElement
- * @param {string} tag Examples: 'div', 'a'
+ * @param {'div'|'span'|'a'|'button'|'p'|'input'|'label'|'h1'|'h2'|'h3'|'h4'|'h5'|'table'|'thead'|'tbody'|'th'|'tr'|'td'|'svg'|'path'} tag
  * @param {string} classes
  * @param {string} id
  * @param {string} innerText
- * @param {Object} attributes Example {'type': 'checkbox', 'required': ''}
+ * @param {Object.<string, string>} attributes
  * @returns {HTMLElement}
  */
-function createHtmlElement(rootElement, tag, classes = '', id = '', innerText = '', attributes = []) {
+function createHtmlElement(rootElement, tag, classes = '', id = '', innerText = '', attributes = {}) {
     let htmlElement = document.createElement(tag);
 
     if (classes) {
@@ -56,6 +77,10 @@ function createLoginForm() {
     }
 }
 
+/**
+ * @param {String[]} inputIds
+ * @returns {Promise<ResponseJson>}
+ */
 async function fetchUserData(inputIds) {
     let inputData = {};
 
@@ -74,7 +99,7 @@ async function fetchUserData(inputIds) {
 
 /**
  * @param {number} id
- * @returns {Promise<any>}
+ * @returns {Promise<ResponseJson>}
  */
 async function fetchSingleOperation(id) {
     let response = await fetch(OPERATION_LINK_PREFIX + id, {
@@ -89,6 +114,7 @@ async function askList() {
         headers: {'Content-Type': 'application/json;charset=utf-8'},
     });
 
+    /** @type {ResponseJson} */
     let decodedResponse = await response.json(); // success or error
 
     if (decodedResponse.status === STATUS_ERROR) {
@@ -101,7 +127,7 @@ async function askList() {
     return showList(decodedResponse.data['operations']);
 }
 
-/** @param {Array.<{id: number, is_income: boolean, amount: number, comment: string}>} operations */
+/** @param {Array.<OperationArray>} operations */
 function showList(operations) {
 
     if (operations.length === 0) {
@@ -130,23 +156,103 @@ function showList(operations) {
 
         let tdForCheckboxBlock = createHtmlElement(trBlock, 'td', "p-4 w-4");
         createCheckboxForTableBlock(tdForCheckboxBlock, CHECKBOX_PREFIX_ID + operation.id);
-        createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.id);
-        createTdForAmount(trBlock, operation.amount, operation.is_income)
+        createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.id.toString());
+        createTdForAmount(trBlock, operation);
         createHtmlElement(trBlock, 'td', DEFAULT_TD_CLASSES, '', operation.comment);
         createTdForType(trBlock, operation.is_income);
         createTdForLink(trBlock, operation.id);
     })
 }
 
-/** @param {Array.<id: number, is_income: boolean, amount: number, comment: string>} operation */
+/** @param {OperationArray} operation */
 function showOperation(operation) {
-    // #TODO Show Operation
+    if (document.getElementById(OPERATION_MODAL_ID) === null) {
+        createModalForOperation(operation);
+    } else {
+        changeAndShowModalForOperation(operation);
+    }
 }
 
+/** @param {OperationArray} operation */
+function createModalForOperation(operation) {
+    let modalBlock = createHtmlElement(document.body, 'div', "bg-slate-600/50 fixed w-full p-4 inset-0", OPERATION_MODAL_ID);
+    let divRoot2Block = createHtmlElement(modalBlock, 'div', "relative w-full h-full max-w-2xl m-auto");
+    let divRoot3Block = createHtmlElement(divRoot2Block, 'div', "bg-white rounded-lg shadow");
+
+    let line1Block = createHtmlElement(divRoot3Block, 'div', "flex items-start justify-between p-4 border-b rounded-t text-xl font-semibold text-gray-900");
+    createHtmlElement(line1Block, 'span', '', '', 'Operation ID:');
+    createHtmlElement(line1Block, 'span', 'pl-1', OPERATION_ID_ID, operation.id.toString());
+    let closeButtonBlock = createHtmlElement(line1Block, 'button', "text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center", '', '', {'type': 'button'});
+    let svgCloseButtonBlock = createHtmlElement(closeButtonBlock, 'svg', "w-5 h-5", '', '', {
+        "fill": "currentColor",
+        "viewBox": "0 0 20 20",
+        "xmlns": "http://www.w3.org/2000/svg"
+    });
+    createHtmlElement(svgCloseButtonBlock, 'path', '', '', '', {
+        "fill-rule": "evenodd",
+        "d": "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z",
+        "clip-rule": "evenodd"
+    });
+    createHtmlElement(line1Block, 'span', "sr-only", '', 'Close modal');
+
+    let line2Block = createHtmlElement(divRoot3Block, 'span', "flex items-start justify-between p-4 border-b rounded-t text-xl font-semibold text-gray-900");
+    createHtmlElement(line2Block, 'span', "pl-1", '', 'Type:');
+    createHtmlElement(line2Block, 'span', '', OPERATION_TYPE_ID, getOperationTypeString(operation));
+
+    let line3Block = createHtmlElement(divRoot3Block, 'span', "flex items-start justify-between p-4 border-b rounded-t text-xl font-semibold text-gray-900");
+    createHtmlElement(line3Block, 'span', "pl-1", '', 'Amount:');
+    createHtmlElement(line3Block, 'span', operation.is_income ? "text-green-500" : "text-red-500", OPERATION_AMOUNT_ID, getOperationAmountString(operation));
+
+    createHtmlElement(divRoot3Block, 'p', 'p-6 space-y-6 text-base text-gray-500', OPERATION_COMMENT_ID, operation.comment);
+
+    let line4Block = createHtmlElement(divRoot3Block, 'div', "flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b");
+    let bottomButton = createHtmlElement(line4Block, 'button', "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", '', 'Back to list', {'type': 'button'});
+
+    closeButtonBlock.addEventListener('click', toggleModal);
+    bottomButton.addEventListener('click', toggleModal);
+}
+
+/** @param {OperationArray} operation */
+function changeAndShowModalForOperation(operation) {
+    document.getElementById(OPERATION_ID_ID).innerText = operation.id.toString();
+    document.getElementById(OPERATION_TYPE_ID).innerText = getOperationTypeString(operation);
+    document.getElementById(OPERATION_AMOUNT_ID).innerText = getOperationAmountString(operation);
+    document.getElementById(OPERATION_AMOUNT_ID).classList.add(operation.is_income ? "text-green-500" : "text-red-500");
+    document.getElementById(OPERATION_COMMENT_ID).innerText = operation.comment;
+    toggleModal();
+}
+
+/** @param {OperationArray} operation */
+function getOperationTypeString(operation) {
+    return operation.is_income ? 'Income' : 'Expense';
+}
+
+/** @param {OperationArray} operation */
+function getOperationAmountString(operation) {
+    let prefix = operation.is_income ? '+' : '-';
+    let amount = operation.amount.toFixed(2)
+    return prefix + amount;
+}
+
+function toggleModal() {
+    let modalBlock = document.getElementById(OPERATION_MODAL_ID);
+
+    if (modalBlock.style.display === "none") {
+        modalBlock.style.display = "block";
+    } else {
+        modalBlock.style.display = "none";
+    }
+}
+
+/**
+ * @param {ResponseJson} result
+ * @param successCallback
+ * @returns {*|void}
+ */
 function processResponse(result, successCallback) { // success or fail
 
     if (result.status === STATUS_SUCCESS) {
-        return successCallback(result);
+        return successCallback(result.data);
     } else if (result.status === STATUS_FAIL) {
         return alert(result.data[NOTIFICATION]);
     }
@@ -282,16 +388,15 @@ function createCheckboxForTableBlock(rootBlock, id) {
 
 /**
  * @param {HTMLElement} rootBlock
- * @param {number} amount
- * @param {boolean} isIncome
+ * @param {OperationArray} operation
  * @returns {HTMLElement}
  */
-function createTdForAmount(rootBlock, amount, isIncome) {
+function createTdForAmount(rootBlock, operation) {
     let tdForAmountBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
-    if (isIncome) {
-        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-green-500", '', '+' + amount.toFixed(2));
+    if (operation.is_income) {
+        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-green-500", '', getOperationAmountString(operation));
     } else {
-        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-red-500", '', '-' + amount.toFixed(2));
+        createHtmlElement(tdForAmountBlock, 'span', "font-semibold text-base text-red-500", '', getOperationAmountString(operation));
     }
     return tdForAmountBlock;
 }
@@ -320,18 +425,9 @@ function createTdForLink(rootBlock, id) {
     let tdBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
     let buttonBlock = createHtmlElement(tdBlock, 'button', "font-medium text-blue-600 hover:underline", '', 'View');
     buttonBlock.onclick = function () {
-        fetchSingleOperation(id).then(result => processResponse(result, showOperation));
+        fetchSingleOperation(id).then(operation => processResponse(operation, showOperation));
     }
     return tdBlock;
-}
-
-/**
- * @param {HTMLElement} rootElement
- * @param {string} text
- * @returns {HTMLHeadingElement}
- */
-function createHeader(rootElement, text) {
-    return createHtmlElement(rootElement, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', text);
 }
 
 /**
