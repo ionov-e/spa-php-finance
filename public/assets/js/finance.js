@@ -23,12 +23,18 @@ const OPERATION_COMMENT_ID = OPERATION_ID_PREFIX + 'comment';
 const CHECKBOX_ALL_ID = 'checkbox-all-search';
 const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
 const DEFAULT_TD_CLASSES = "p-4 px-6";
-let containerBlock = createContainerBlock();
+
 
 askForList();
 
 /** @returns {HTMLElement} */
-function createContainerBlock() {
+function createCleanContainerBlock() {
+    let containerBlock = document.getElementById('container');
+
+    if (containerBlock !== null) {
+        containerBlock.remove();
+    }
+
     return createHtmlElement(document.body, 'div', "flex flex-col overflow-hidden container mx-auto py-2 sm:px-6 lg:px-8", 'container');
 }
 
@@ -111,6 +117,7 @@ async function fetchSingleOperation(id) {
 }
 
 function createUnauthenticatedForms() {
+    createCleanContainerBlock();
     createLoginForm();
     createRegisterForm();
 }
@@ -144,8 +151,33 @@ function showList(operations) {
         return alert('There are no operations in DB');
     }
 
-    containerBlock.remove();
-    containerBlock = createContainerBlock();
+    let containerBlock = createCleanContainerBlock();
+
+    let logoutBlock = createHtmlElement(containerBlock,
+        'a', 'font-medium text-blue-600 text-right hover:underline cursor-pointer', '', 'Logout');
+
+    logoutBlock.onclick = async function () {
+        let response = await fetch('/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json;charset=utf-8'},
+            body: JSON.stringify({[LOGOUT_KEY_NAME]: 'logout'})
+        });
+
+        /** @type {ResponseJson} */
+        let decodedResponse = await response.json();
+
+        if (decodedResponse.status === STATUS_SUCCESS) {
+            return createUnauthenticatedForms();
+        }
+
+        if (decodedResponse.status === STATUS_ERROR) {
+            return alert(decodedResponse.message);
+        }
+
+        return alert('Unexpected error');
+    }
+
+    createHtmlElement(containerBlock, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', 'Operation List');
 
     let tableBlock = createHtmlElement(containerBlock, 'table', "w-full");
     let theadBlock = createHtmlElement(tableBlock, 'thead', "text-xs text-gray-700 uppercase bg-gray-50 text-left");
@@ -291,6 +323,7 @@ function createRegisterForm() {
  * @returns {HTMLDivElement}
  */
 function createFormRootBlock(id) {
+    let containerBlock = document.getElementById('container');
     return createHtmlElement(containerBlock, 'div', 'pt-16 mt-8 grid grid-cols-1 gap-6 mx-auto', id);
 }
 
