@@ -87,6 +87,15 @@ class DbMySQL implements DbInterface
         return $this->pdo->prepare($sql)->execute([$operation->isIncome, $operation->amount, $operation->comment]);
     }
 
+    public function deleteOperation(int $operationId): bool
+    {
+        Log::debug(__METHOD__ . " has been started");
+
+        $sql = "DELETE FROM operations WHERE id = ?";
+
+        return $this->pdo->prepare($sql)->execute([$operationId]);
+    }
+
     public function login(string $login, string $password): int
     {
         Log::debug(__METHOD__ . " has been started");

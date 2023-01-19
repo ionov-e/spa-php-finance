@@ -21,6 +21,8 @@ interface DbInterface
 
     public function storeOperation(Operation $operation): bool;
 
+    public function deleteOperation(int $operationId): bool;
+
     /** @return self::RESULT_* */
     public function register(string $login, string $password): int;
 

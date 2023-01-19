@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!empty($postFromJson[AMOUNT_KEY_NAME])) {
         (new Controllers\Operation(new DbMySQL()))->store($postFromJson);
+    } elseif (!empty($postFromJson[DELETE_OPERATION_ID])) {
+        (new Controllers\Operation(new DbMySQL()))->delete($postFromJson);
     }
 
 }
