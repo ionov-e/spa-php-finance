@@ -22,6 +22,7 @@ use \App\Services\Response;
     const REGISTER_FORM_ID = 'register-form'
     const LOGIN_BUTTON_ID = 'login-button'
     const REGISTER_BUTTON_ID = 'register-button'
+    const UNAUTHENTICATED_KEY_NAME = '<?= UNAUTHENTICATED_KEY_NAME ?>'
     const LOGIN_LOGIN_ID = '<?= LOGIN_FOR_LOGIN_KEY_NAME ?>'
     const REGISTER_LOGIN_ID = '<?= LOGIN_FOR_REGISTER_KEY_NAME ?>'
     const PASSWORD_FOR_LOGIN_ID = '<?= PASSWORD_FOR_LOGIN_ID ?>'

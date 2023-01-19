@@ -24,8 +24,8 @@ const CHECKBOX_ALL_ID = 'checkbox-all-search';
 const CHECKBOX_PREFIX_ID = 'checkbox-table-search-';
 const DEFAULT_TD_CLASSES = "p-4 px-6";
 let containerBlock = createContainerBlock();
-createLoginForm();
-createRegisterForm();
+
+askForList();
 
 /** @returns {HTMLElement} */
 function createContainerBlock() {
@@ -74,7 +74,7 @@ function createLoginForm() {
     createAnotherFormLink(formBlock, 'Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
 
     buttonBlock.onclick = function () {
-        fetchUserData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(result => processResponse(result, askList));
+        fetchUserData([LOGIN_LOGIN_ID, PASSWORD_FOR_LOGIN_ID]).then(result => processResponse(result, askForList));
     }
 }
 
@@ -110,16 +110,25 @@ async function fetchSingleOperation(id) {
     return await response.json();
 }
 
-async function askList() {
+function createUnauthenticatedForms() {
+    createLoginForm();
+    createRegisterForm();
+}
+
+async function askForList() {
     let response = await fetch('/', {
         headers: {'Content-Type': 'application/json;charset=utf-8'},
     });
 
     /** @type {ResponseJson} */
-    let decodedResponse = await response.json(); // success or error
+    let decodedResponse = await response.json();
 
     if (decodedResponse.status === STATUS_ERROR) {
         return alert(decodedResponse.message);
+    }
+
+    if (decodedResponse.status === STATUS_FAIL && decodedResponse.data[UNAUTHENTICATED_KEY_NAME]) {
+        return createUnauthenticatedForms();
     }
 
     if (decodedResponse.status !== STATUS_SUCCESS) {
@@ -250,8 +259,7 @@ function toggleModal() {
  * @param successCallback
  * @returns {*|void}
  */
-function processResponse(result, successCallback) { // success or fail
-
+function processResponse(result, successCallback) {
     if (result.status === STATUS_SUCCESS) {
         return successCallback(result.data);
     } else if (result.status === STATUS_FAIL) {
@@ -274,7 +282,7 @@ function createRegisterForm() {
     formBlock.style.display = 'none';
 
     buttonBlock.onclick = function () {
-        fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askList));
+        fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askForList));
     }
 }
 
