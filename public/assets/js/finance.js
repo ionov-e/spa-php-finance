@@ -452,6 +452,16 @@ function processResponse(result, successCallback) {
     alert('Unexpected answer from server');
 }
 
+function checkRegisterData() {
+    return function () {
+        if (document.getElementById(PASSWORD_FOR_REGISTER_ID).value === document.getElementById(PASSWORD_REPEAT_FOR_REGISTER_ID).value) {
+            fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askForList));
+        } else {
+            alert('Passwords fields are not identical');
+        }
+    };
+}
+
 function createRegisterForm() {
     let formBlock = createFormRootBlock(REGISTER_FORM_ID);
 
@@ -463,10 +473,7 @@ function createRegisterForm() {
     createAnotherFormLink(formBlock, 'Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID);
 
     formBlock.style.display = 'none';
-
-    buttonBlock.onclick = function () {
-        fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askForList));
-    }
+    buttonBlock.onclick = checkRegisterData;
 }
 
 /**
