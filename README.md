@@ -29,7 +29,7 @@ Front-end:
     
     `git clone git@github.com:ionov-e/spa-php-finance.git .`
 4. Copy and rename copy of **.env.example** to **.end**
-5. `composer install`
+5. `composer install`. If composer not installed on your system - you still have to run this command
 6. `chmod 775 logs/`
 7. `sudo chown :www-data logs`
 8. `docker compose up -d`
