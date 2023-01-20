@@ -26,6 +26,7 @@ const LOG_MAX_DAYS = 120;
 const UNAUTHENTICATED_KEY_NAME = 'unauthenticated';
 const SEARCH_KEY_NAME = 'search';
 const OPERATION_ID_KEY_NAME = 'operation_id';
+const DELETE_OPERATION_ID = 'delete_operation_id';
 const LOGIN_FOR_REGISTER_KEY_NAME = 'register';
 const LOGIN_FOR_LOGIN_KEY_NAME = 'login';
 const LOGOUT_KEY_NAME = 'logout';

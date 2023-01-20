@@ -22,6 +22,7 @@ use \App\Services\Response;
     const IS_INCOME_KEY_NAME = '<?= IS_INCOME_KEY_NAME ?>';
     const COMMENT_KEY_NAME = '<?= COMMENT_KEY_NAME ?>';
     const OPERATION_ID_KEY_NAME = '<?= OPERATION_ID_KEY_NAME ?>';
+    const DELETE_OPERATION_ID = '<?= DELETE_OPERATION_ID ?>';
     const LOGOUT_KEY_NAME = '<?= LOGOUT_KEY_NAME ?>';
     const LOGIN_FORM_ID = 'login-form';
     const REGISTER_FORM_ID = 'register-form';

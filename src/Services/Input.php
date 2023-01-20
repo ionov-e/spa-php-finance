@@ -23,9 +23,19 @@ class Input
 
     public static function getOperationIdFromGet(): int
     {
+        return self::getInt($_GET[OPERATION_ID_KEY_NAME]);
+    }
+
+    public static function getDeleteOperationId(array $postFromJson): int
+    {
+        return self::getInt($postFromJson[DELETE_OPERATION_ID]);
+    }
+
+    private static function getInt($operationId): int
+    {
         $defaultErrorMessage = 'ID should be a positive number';
 
-        if (!is_string($operationId = $_GET[OPERATION_ID_KEY_NAME])) {
+        if (!is_string($operationId)) {
             Log::debug("Provided operation ID is not a string: " . json_encode($operationId));
             throw new UnexpectedValueException($defaultErrorMessage);
         }

@@ -61,6 +61,23 @@ class Operation
 
     }
 
+    public function delete(array $postFromJson): never
+    {
+        Log::init('opDel');
+
+        try {
+            $operationId = Input::getDeleteOperationId($postFromJson);
+            $this->db->deleteOperation($operationId);
+            Response::success();
+        } catch (UnexpectedValueException $e) {
+            Log::info("Invalid input: {$e->getMessage()}");
+            Response::fail([NOTIFICATION => "Please correct your input, we've got an error: {$e->getMessage()}"]);
+        } catch (\Throwable $e) {
+            Log::error("Throwable: {$e->getMessage()}");
+            Response::error('Unforeseen error');
+        }
+    }
+
     public function showByID(): never
     {
         Log::init('opShowById');
