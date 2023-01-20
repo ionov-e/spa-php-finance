@@ -35,5 +35,5 @@ Front-end:
 ![login](docs/images/001.png)
 ![register](docs/images/002.png)
 ![list](docs/images/010.png)
-![new_form](docs/images/011.png)
+![new_form](docs/images/011-.png)
 ![single](docs/images/012.png)
