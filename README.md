@@ -30,3 +30,10 @@ Front-end:
 8. Visit http://localhost:55000/finance.php
 9. You can log in with **test** both as login and password. Or register a new user
 
+## Appearance
+
+![login](docs/images/001.png)
+![register](docs/images/002.png)
+![list](docs/images/010.png)
+![new_form](docs/images/011.png)
+![single](docs/images/012.png)
