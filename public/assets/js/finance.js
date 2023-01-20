@@ -15,6 +15,7 @@
 
 const OPERATION_LINK_PREFIX = '/?' + OPERATION_ID_KEY_NAME + '=';
 const OPERATION_MODAL_ID = 'operationModal';
+const CREATE_OPERATION_MODAL_ID = 'create-operation';
 const OPERATION_ID_PREFIX = 'single-operation-';
 const OPERATION_ID_ID = OPERATION_ID_PREFIX + ID_KEY_NAME;
 const OPERATION_TYPE_ID = OPERATION_ID_PREFIX + 'type';
@@ -39,7 +40,7 @@ function createCleanContainerBlock() {
 }
 
 /**
- * @param {HTMLElement} rootElement
+ * @param {HTMLElement|SVGSVGElement} rootElement
  * @param {'div'|'span'|'a'|'button'|'p'|'input'|'label'|'h1'|'h2'|'h3'|'h4'|'h5'|'table'|'thead'|'tbody'|'tfoot'|'th'|'tr'|'td'|'svg'|'path'} tag
  * @param {string} classes
  * @param {string} id
@@ -62,20 +63,48 @@ function createHtmlElement(rootElement, tag, classes = '', id = '', innerText = 
         htmlElement.innerText = innerText;
     }
 
-    for (const [key, value] of Object.entries(attributes)) {
-        htmlElement.setAttribute(key, value);
-    }
+    addAttributes(htmlElement, attributes);
 
     rootElement.append(htmlElement);
     return htmlElement;
+}
+
+/**
+ * @param {HTMLElement|SVGSVGElement} rootElement
+ * @param {'svg'|'path'} tag
+ * @param {Object.<string, string>} attributes
+ * @param {string} classes
+ * @returns {SVGSVGElement}
+ */
+function createSvgElement(rootElement, tag, attributes = {}, classes = '') {
+    let htmlElement = document.createElementNS('http://www.w3.org/2000/svg', tag);
+
+    if (classes) {
+        addClassesToHtml(htmlElement, classes);
+    }
+
+    addAttributes(htmlElement, attributes);
+
+    rootElement.append(htmlElement);
+    return htmlElement;
+}
+
+/**
+ * @param {HTMLElement|SVGSVGElement} htmlElement
+ * @param {Object.<string, string>} attributes
+ */
+function addAttributes(htmlElement, attributes) {
+    for (const [key, value] of Object.entries(attributes)) {
+        htmlElement.setAttribute(key, value);
+    }
 }
 
 function createLoginForm() {
     let formBlock = createFormRootBlock(LOGIN_FORM_ID);
 
     createFormHeader(formBlock, 'Login');
-    createFormLabelBlock(formBlock, 'Login', 'text', LOGIN_LOGIN_ID);
-    createFormLabelBlock(formBlock, 'Password', 'password', PASSWORD_FOR_LOGIN_ID);
+    createFormInputBlock(formBlock, 'Login', 'text', LOGIN_LOGIN_ID);
+    createFormInputBlock(formBlock, 'Password', 'password', PASSWORD_FOR_LOGIN_ID);
     let buttonBlock = createFormButton(formBlock, 'Login', LOGIN_BUTTON_ID);
     createAnotherFormLink(formBlock, 'Not registered?', LOGIN_FORM_ID, REGISTER_FORM_ID);
 
@@ -94,6 +123,25 @@ async function fetchUserData(inputIds) {
     inputIds.forEach((id) => {
         inputData[id] = document.getElementById(id).value;
     });
+
+    let response = await fetch('/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json;charset=utf-8'},
+        body: JSON.stringify(inputData)
+    });
+
+    return await response.json();
+}
+
+async function fetchNewOperation() {
+    let inputData = {};
+
+
+    [AMOUNT_KEY_NAME, COMMENT_KEY_NAME].forEach((id) => {
+        inputData[id] = document.getElementById(id).value;
+    });
+
+    inputData[IS_INCOME_KEY_NAME] = document.getElementById(IS_INCOME_KEY_NAME).checked;
 
     let response = await fetch('/', {
         method: 'POST',
@@ -144,11 +192,20 @@ async function askForList() {
     return showList(decodedResponse.data['operations']);
 }
 
+function hideModalForNewOperation() {
+    let newOperationFormBlock = document.getElementById(CREATE_OPERATION_MODAL_ID);
+    if (newOperationFormBlock !== null) {
+        newOperationFormBlock.style.display = "none";
+    }
+}
+
 /**
  * @param {Array.<OperationArray>} operations
  * @param {String} title
  */
 function showList(operations, title = 'Last 10 operations:') {
+
+    hideModalForNewOperation();
 
     if (operations.length === 0) {
         return alert('There are no operations in DB');
@@ -159,6 +216,10 @@ function showList(operations, title = 'Last 10 operations:') {
     let logoutLink = createHtmlElement(containerBlock,
         'a', 'font-medium text-blue-600 text-right hover:underline cursor-pointer', '', 'Logout');
     logoutLink.onclick = logout;
+
+    let createNewOperationLink = createHtmlElement(containerBlock,
+        'a', 'font-medium text-blue-600 text-right hover:underline cursor-pointer mt-2', '', 'Create new operation');
+    createNewOperationLink.onclick = showCreateOperationForm;
 
     createHtmlElement(containerBlock, 'h1', 'text-3xl font-bold underline mx-auto my-5', '', title);
 
@@ -208,7 +269,7 @@ function showList(operations, title = 'Last 10 operations:') {
     createHtmlElement(divExpenseBlock, 'span', 'text-red-500', '', totalExpense.toFixed(2));
 }
 
-async function logout () {
+async function logout() {
     let response = await fetch('/', {
         method: 'POST',
         headers: {'Content-Type': 'application/json;charset=utf-8'},
@@ -230,16 +291,46 @@ async function logout () {
 }
 
 /** @param {OperationArray} operation */
-function showOperation(operation) {
+function showSingleOperation(operation) {
     if (document.getElementById(OPERATION_MODAL_ID) === null) {
-        createModalForOperation(operation);
+        createModalForSingleOperation(operation);
     } else {
         changeAndShowModalForOperation(operation);
     }
 }
 
+function showCreateOperationForm() {
+    if (document.getElementById(CREATE_OPERATION_MODAL_ID) === null) {
+        createModalFormForNewOperation();
+    } else {
+        toggleCreateOperationModal();
+    }
+}
+
+function createModalFormForNewOperation() {
+    let modalBlock = createHtmlElement(document.body, 'div', "bg-slate-600/50 fixed w-full p-4 inset-0", CREATE_OPERATION_MODAL_ID);
+    let divRoot2Block = createHtmlElement(modalBlock, 'div', "relative w-full h-full max-w-2xl m-auto");
+    let divRoot3Block = createHtmlElement(divRoot2Block, 'div', "bg-white rounded-lg shadow w-96 px-8 m-auto");
+
+    let formBlock = createHtmlElement(divRoot3Block, 'div', 'py-8 mt-16 grid grid-cols-1 gap-6 mx-auto');
+
+    let line1Block = createHtmlElement(formBlock, 'div', "flex items-start justify-between p-4 rounded-t text-xl font-semibold text-gray-900");
+    createFormHeader(line1Block, 'New operation');
+    let closeButtonBlock = createModalCloseButton(line1Block);
+    closeButtonBlock.onclick = toggleCreateOperationModal;
+
+    createFormRadioBlock(formBlock);
+    createFormInputBlock(formBlock, 'Amount', 'number', AMOUNT_KEY_NAME);
+    createFormInputBlock(formBlock, 'Comment', 'text', COMMENT_KEY_NAME);
+    let buttonBlock = createFormButton(formBlock, 'Create');
+
+    buttonBlock.onclick = function () {
+        fetchNewOperation().then(result => processResponse(result, askForList));
+    }
+}
+
 /** @param {OperationArray} operation */
-function createModalForOperation(operation) {
+function createModalForSingleOperation(operation) {
     let modalBlock = createHtmlElement(document.body, 'div', "bg-slate-600/50 fixed w-full p-4 inset-0", OPERATION_MODAL_ID);
     let divRoot2Block = createHtmlElement(modalBlock, 'div', "relative w-full h-full max-w-2xl m-auto");
     let divRoot3Block = createHtmlElement(divRoot2Block, 'div', "bg-white rounded-lg shadow");
@@ -247,17 +338,7 @@ function createModalForOperation(operation) {
     let line1Block = createHtmlElement(divRoot3Block, 'div', "flex items-start justify-between p-4 border-b rounded-t text-xl font-semibold text-gray-900");
     createHtmlElement(line1Block, 'span', '', '', 'Operation ID:');
     createHtmlElement(line1Block, 'span', 'pl-1', OPERATION_ID_ID, operation.id.toString());
-    let closeButtonBlock = createHtmlElement(line1Block, 'button', "text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center", '', '', {'type': 'button'});
-    let svgCloseButtonBlock = createHtmlElement(closeButtonBlock, 'svg', "w-5 h-5", '', '', {
-        "fill": "currentColor",
-        "viewBox": "0 0 20 20",
-        "xmlns": "http://www.w3.org/2000/svg"
-    });
-    createHtmlElement(svgCloseButtonBlock, 'path', '', '', '', {
-        "fill-rule": "evenodd",
-        "d": "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z",
-        "clip-rule": "evenodd"
-    });
+    let closeButtonBlock = createModalCloseButton(line1Block);
     createHtmlElement(line1Block, 'span', "sr-only", '', 'Close modal');
 
     let line2Block = createHtmlElement(divRoot3Block, 'span', "flex items-start justify-between p-4 border-b rounded-t text-xl font-semibold text-gray-900");
@@ -273,8 +354,29 @@ function createModalForOperation(operation) {
     let line4Block = createHtmlElement(divRoot3Block, 'div', "flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b");
     let bottomButton = createHtmlElement(line4Block, 'button', "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", '', 'Back to list', {'type': 'button'});
 
-    closeButtonBlock.addEventListener('click', toggleModal);
-    bottomButton.addEventListener('click', toggleModal);
+    closeButtonBlock.onclick = toggleSingleOperationModal;
+    bottomButton.onclick = toggleSingleOperationModal;
+}
+
+/**
+ * @param {HTMLElement} rootBlock
+ * @returns {HTMLElement}
+ */
+function createModalCloseButton(rootBlock) {
+    let closeButtonBlock = createHtmlElement(rootBlock, 'button', "text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center", '', '', {
+        'type': 'button',
+        "data-modal-hide": "defaultModal"
+    });
+    let svgCloseButtonBlock = createSvgElement(closeButtonBlock, 'svg', {
+        'fill': "currentColor",
+        'viewBox': '0 0 24 24'
+    }, "w-6 h-6");
+    createSvgElement(svgCloseButtonBlock, 'path', {
+        "d": "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z",
+        "fill-rule": "evenodd",
+        "clip-rule": "evenodd"
+    });
+    return closeButtonBlock;
 }
 
 /** @param {OperationArray} operation */
@@ -284,7 +386,7 @@ function changeAndShowModalForOperation(operation) {
     document.getElementById(OPERATION_AMOUNT_ID).innerText = getOperationAmountString(operation);
     document.getElementById(OPERATION_AMOUNT_ID).classList.add(operation.is_income ? "text-green-500" : "text-red-500");
     document.getElementById(OPERATION_COMMENT_ID).innerText = operation.comment;
-    toggleModal();
+    toggleSingleOperationModal();
 }
 
 /** @param {OperationArray} operation */
@@ -299,13 +401,19 @@ function getOperationAmountString(operation) {
     return prefix + amount;
 }
 
-function toggleModal() {
-    let modalBlock = document.getElementById(OPERATION_MODAL_ID);
+function toggleSingleOperationModal() {
+    toggleBlock(document.getElementById(OPERATION_MODAL_ID));
+}
 
-    if (modalBlock.style.display === "none") {
-        modalBlock.style.display = "block";
+function toggleCreateOperationModal() {
+    toggleBlock(document.getElementById(CREATE_OPERATION_MODAL_ID));
+}
+
+function toggleBlock(targetBlock) {
+    if (targetBlock.style.display === "none") {
+        targetBlock.style.display = "block";
     } else {
-        modalBlock.style.display = "none";
+        targetBlock.style.display = "none";
     }
 }
 
@@ -328,9 +436,9 @@ function createRegisterForm() {
     let formBlock = createFormRootBlock(REGISTER_FORM_ID);
 
     createFormHeader(formBlock, 'Register');
-    createFormLabelBlock(formBlock, 'Login', 'text', REGISTER_LOGIN_ID);
-    createFormLabelBlock(formBlock, 'Password', 'password', PASSWORD_FOR_REGISTER_ID);
-    createFormLabelBlock(formBlock, 'Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID);
+    createFormInputBlock(formBlock, 'Login', 'text', REGISTER_LOGIN_ID);
+    createFormInputBlock(formBlock, 'Password', 'password', PASSWORD_FOR_REGISTER_ID);
+    createFormInputBlock(formBlock, 'Repeat password', 'password', PASSWORD_REPEAT_FOR_REGISTER_ID);
     let buttonBlock = createFormButton(formBlock, 'Register', REGISTER_BUTTON_ID);
     createAnotherFormLink(formBlock, 'Already registered?', REGISTER_FORM_ID, LOGIN_FORM_ID);
 
@@ -366,12 +474,38 @@ function createFormHeader(rootElement, header) {
  * @param {string} id
  * @returns {HTMLLabelElement}
  */
-function createFormLabelBlock(rootElement, labelText, inputType, id) {
+function createFormInputBlock(rootElement, labelText, inputType, id) {
     let labelBlock = createHtmlElement(rootElement, 'label', 'block');
     createHtmlElement(labelBlock, 'span', 'text-gray-700', '', labelText);
     createInputBlockForForm(labelBlock, inputType, id);
-
     return labelBlock;
+}
+
+/**
+ * @param {HTMLElement} rootElement
+ * @returns {HTMLElement}
+ */
+function createFormRadioBlock(rootElement) {
+    let divRootBlock = createHtmlElement(rootElement, 'div', "flex justify-between text-gray-700 w-full my-2");
+
+    createHtmlElement(divRootBlock, 'span', '', '', 'Type');
+
+    let divIncomeBlock = createHtmlElement(divRootBlock, 'div', "form-check ml-3");
+    createHtmlElement(divIncomeBlock, 'input', "form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer", IS_INCOME_KEY_NAME, '', {
+        'type': 'radio',
+        'name': 'radioUnique',
+        'checked': ''
+    });
+    createHtmlElement(divIncomeBlock, 'label', "form-check-label inline-block text-gray-800", '', 'Income');
+
+    let divExpanseBlock = createHtmlElement(divRootBlock, 'div', "form-check ml-3");
+    createHtmlElement(divExpanseBlock, 'input', "form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer", '', '', {
+        'type': 'radio',
+        'name': 'radioUnique'
+    });
+    createHtmlElement(divExpanseBlock, 'label', "form-check-label inline-block text-gray-800", '', 'Expense');
+
+    return divRootBlock;
 }
 
 /**
@@ -405,7 +539,7 @@ function createInputBlockForForm(rootElement, inputType, id) {
  * @param {string} buttonId
  * @returns {HTMLButtonElement}
  */
-function createFormButton(rootElement, text, buttonId) {
+function createFormButton(rootElement, text, buttonId = '') {
     return createHtmlElement(rootElement,
         'button',
         'text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mx-2 my-3',
@@ -484,15 +618,15 @@ function createTdForType(rootBlock, isIncome) {
  */
 function createTdForLink(rootBlock, id) {
     let tdBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
-    let buttonBlock = createHtmlElement(tdBlock, 'button', "font-medium text-blue-600 hover:underline", '', 'View');
+    let buttonBlock = createHtmlElement(tdBlock, 'button', "font-medium text-blue-600 hover:underline", '', 'Open');
     buttonBlock.onclick = function () {
-        fetchSingleOperation(id).then(operation => processResponse(operation, showOperation));
+        fetchSingleOperation(id).then(operation => processResponse(operation, showSingleOperation));
     }
     return tdBlock;
 }
 
 /**
- * @param {HTMLElement} htmlElement
+ * @param {HTMLElement|SVGSVGElement} htmlElement
  * @param {string} classes
  */
 function addClassesToHtml(htmlElement, classes) {

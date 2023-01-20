@@ -84,7 +84,7 @@ class DbMySQL implements DbInterface
 
         $sql = "INSERT INTO operations (is_income, amount, comment) VALUES (?,?,?)";
 
-        return $this->pdo->prepare($sql)->execute([$operation->isIncome, $operation->amount, $operation->comment]);
+        return $this->pdo->prepare($sql)->execute([(int)$operation->isIncome, $operation->amount, $operation->comment]);
     }
 
     public function deleteOperation(int $operationId): bool

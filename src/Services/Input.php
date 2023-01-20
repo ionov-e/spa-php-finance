@@ -23,15 +23,15 @@ class Input
 
     public static function getOperationIdFromGet(): int
     {
-        return self::getInt($_GET[OPERATION_ID_KEY_NAME]);
+        return self::getIntFromIdString($_GET[OPERATION_ID_KEY_NAME]);
     }
 
     public static function getDeleteOperationId(array $postFromJson): int
     {
-        return self::getInt($postFromJson[DELETE_OPERATION_ID]);
+        return self::getIntFromIdString($postFromJson[DELETE_OPERATION_ID]);
     }
 
-    private static function getInt($operationId): int
+    private static function getIntFromIdString($operationId): int
     {
         $defaultErrorMessage = 'ID should be a positive number';
 

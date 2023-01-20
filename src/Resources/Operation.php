@@ -24,17 +24,22 @@ class Operation
         $amount = $array[AMOUNT_KEY_NAME];
         $comment = $array[COMMENT_KEY_NAME];
 
-        switch (true) {
-            case strlen($comment) > 60:
-                throw new UnexpectedValueException('Comment is more than 60 symbols');
-            case strlen($comment) === 0:
-                throw new UnexpectedValueException('Comment is empty');
-            case $amount = (float)$amount:
-                throw new UnexpectedValueException('Amount should be a number');
-            case $amount <= 0:
-                throw new UnexpectedValueException('Amount should be a positive number');
-            case !is_bool($isIncome):
-                throw new UnexpectedValueException(IS_INCOME_KEY_NAME . ' parameter should be true or false');
+        if (!is_string($comment) || strlen($comment) > 60 || strlen($comment) === 0) {
+            throw new UnexpectedValueException("Comment should be a not empty string, less than 60 symbols");
+        }
+
+        if (!is_numeric($amount)) {
+            throw new UnexpectedValueException('Amount should be a number');
+        }
+
+        $amount = (float)$amount;
+
+        if ($amount <= 0) {
+            throw new UnexpectedValueException('Amount should be a positive number');
+        }
+
+        if (!is_bool($isIncome)) {
+            throw new UnexpectedValueException(IS_INCOME_KEY_NAME . ' parameter should be true or false');
         }
 
         Log::debug("PostResource content: [$isIncome, $amount, $comment]");
