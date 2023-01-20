@@ -133,9 +133,8 @@ async function fetchUserData(inputIds) {
     return await response.json();
 }
 
-async function fetchNewOperation() {
+async function fetchStoreNewOperation() {
     let inputData = {};
-
 
     [AMOUNT_KEY_NAME, COMMENT_KEY_NAME].forEach((id) => {
         inputData[id] = document.getElementById(id).value;
@@ -152,11 +151,23 @@ async function fetchNewOperation() {
     return await response.json();
 }
 
+async function fetchDeleteOperation() {
+    let inputData = {[DELETE_OPERATION_ID]: document.getElementById(OPERATION_ID_ID).innerText.toString()};
+
+    let response = await fetch('/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json;charset=utf-8'},
+        body: JSON.stringify(inputData)
+    });
+
+    return await response.json();
+}
+
 /**
  * @param {number} id
  * @returns {Promise<ResponseJson>}
  */
-async function fetchSingleOperation(id) {
+async function fetchGetSingleOperation(id) {
     let response = await fetch(OPERATION_LINK_PREFIX + id, {
         headers: {'Content-Type': 'application/json;charset=utf-8'}
     });
@@ -192,10 +203,15 @@ async function askForList() {
     return showList(decodedResponse.data['operations']);
 }
 
-function hideModalForNewOperation() {
+function hideModals() {
     let newOperationFormBlock = document.getElementById(CREATE_OPERATION_MODAL_ID);
     if (newOperationFormBlock !== null) {
         newOperationFormBlock.style.display = "none";
+    }
+
+    let modalForSingleOperation = document.getElementById(OPERATION_MODAL_ID);
+    if (modalForSingleOperation !== null) {
+        modalForSingleOperation.style.display = "none";
     }
 }
 
@@ -205,7 +221,7 @@ function hideModalForNewOperation() {
  */
 function showList(operations, title = 'Last 10 operations:') {
 
-    hideModalForNewOperation();
+    hideModals();
 
     if (operations.length === 0) {
         return alert('There are no operations in DB');
@@ -325,7 +341,7 @@ function createModalFormForNewOperation() {
     let buttonBlock = createFormButton(formBlock, 'Create');
 
     buttonBlock.onclick = function () {
-        fetchNewOperation().then(result => processResponse(result, askForList));
+        fetchStoreNewOperation().then(result => processResponse(result, askForList));
     }
 }
 
@@ -352,10 +368,14 @@ function createModalForSingleOperation(operation) {
     createHtmlElement(divRoot3Block, 'p', 'p-6 space-y-6 text-base text-gray-500', OPERATION_COMMENT_ID, operation.comment);
 
     let line4Block = createHtmlElement(divRoot3Block, 'div', "flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b");
-    let bottomButton = createHtmlElement(line4Block, 'button', "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center", '', 'Back to list', {'type': 'button'});
+    let backButton = createHtmlElement(line4Block, 'button', "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-3 text-center", '', 'Back to list', {'type': 'button'});
+    let deleteButton = createHtmlElement(line4Block, 'button', "text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-3 text-center", '', 'Delete Operation', {'type': 'button'});
 
     closeButtonBlock.onclick = toggleSingleOperationModal;
-    bottomButton.onclick = toggleSingleOperationModal;
+    backButton.onclick = toggleSingleOperationModal;
+    deleteButton.onclick = function () {
+        fetchDeleteOperation().then(result => processResponse(result, askForList));
+    }
 }
 
 /**
@@ -527,6 +547,7 @@ function createInputBlockForForm(rootElement, inputType, id) {
     if (inputType === 'number') {
         inputBlock.setAttribute('rows', '2');
         inputBlock.setAttribute('min', '0');
+        inputBlock.setAttribute('max', '99999999');
         inputBlock.setAttribute('step', '0.01');
     }
 
@@ -620,7 +641,7 @@ function createTdForLink(rootBlock, id) {
     let tdBlock = createHtmlElement(rootBlock, 'td', DEFAULT_TD_CLASSES);
     let buttonBlock = createHtmlElement(tdBlock, 'button', "font-medium text-blue-600 hover:underline", '', 'Open');
     buttonBlock.onclick = function () {
-        fetchSingleOperation(id).then(operation => processResponse(operation, showSingleOperation));
+        fetchGetSingleOperation(id).then(operation => processResponse(operation, showSingleOperation));
     }
     return tdBlock;
 }
