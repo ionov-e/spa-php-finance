@@ -28,13 +28,17 @@ Front-end:
 3. Clone the project into the folder with:
     
     `git clone git@github.com:ionov-e/spa-php-finance.git .`
-4. Copy and rename copy of **.env.example** to **.end**
-5. `composer install`. If composer not installed on your system - you still have to run this command
+4. Copy and rename copy of **.env.example** to **.end** (no edit necessary)
+5. `composer install`. If composer not installed on your system - you still have to run this command somehow
 6. `chmod 775 logs/`
 7. `sudo chown :www-data logs`
 8. `docker compose up -d`
 9. Visit http://localhost:55000/finance.php
 10. You can log in with **test** both as login and password. Or register a new user
+
+When you end - don't forget to stop Docker containers with command:
+
+`docker compose stop`
 
 ## Appearance
 
