@@ -453,13 +453,11 @@ function processResponse(result, successCallback) {
 }
 
 function checkRegisterData() {
-    return function () {
-        if (document.getElementById(PASSWORD_FOR_REGISTER_ID).value === document.getElementById(PASSWORD_REPEAT_FOR_REGISTER_ID).value) {
-            fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askForList));
-        } else {
-            alert('Passwords fields are not identical');
-        }
-    };
+    if (document.getElementById(PASSWORD_FOR_REGISTER_ID).value === document.getElementById(PASSWORD_REPEAT_FOR_REGISTER_ID).value) {
+        fetchUserData([REGISTER_LOGIN_ID, PASSWORD_FOR_REGISTER_ID]).then(result => processResponse(result, askForList));
+    } else {
+        alert('Passwords fields are not identical');
+    }
 }
 
 function createRegisterForm() {
