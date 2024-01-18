@@ -1,44 +1,62 @@
 # Simple SPA
 ## Description
 
-Specifics:
+**Specifics**:
 - Simple SPA page
 - Front is written in Vanilla JS. Styled using Tailwind CSS
 - Backend is run in Docker container (Nginx, PHP with no frameworks, MySQL)
 - Operations list (income/expense) with last 10 entities
 - Possibility to create new operation
 - Possibility to view/delete specific operation
-- Access to is restricted only for authorized users except for login and register
+- For unauthorized users access is restricted except for login and register
 - Some basic security safeguards (SQL injections, etc)
 - Database is prefilled with some operations and test user for instant usage
 
-Back-end: 
+**Back-end**: 
 - PHP 8.1 (no frameworks)
 - MySQL 8
 - Nginx
 - Docker
 
-Front-end:
+**Front-end**:
 - Vanilla JavaScript
+- All HTML is generated only by JS - no pre-written HTML whatsoever
 - Tailwind CSS
 
 ## Setup process
 1. Create a folder we want to use for this project
 2. Enter inside created folder using terminal
-3. Clone the project into the folder with:
-    
-    `git clone git@github.com:ionov-e/spa-php-finance.git .`
-4. Copy and rename copy of **.env.example** to **.end** (no edit necessary)
-5. `composer install`. If composer not installed on your system - you still have to run this command somehow
-6. `chmod 775 logs/`
-7. `sudo chown :www-data logs`
-8. `docker compose up -d`
-9. Visit http://localhost:55000/finance.php
-10. You can log in with **test** both as login and password. Or register a new user
+3. Clone the project into the chosen folder with:
+   ```sh
+   git clone git@github.com:ionov-e/spa-php-finance.git .
+   ```
+4. Builds and runs containers
+   ```sh
+   docker compose up -d
+   ```
+5. Allow for Monolog library to make log files
+   ```sh
+   chmod 777 logs/
+   ```
+6. Enters PHP container CLI
+   ```sh
+   docker run -it spa-php-finance-php-fpm-1 bash
+   ```
+7. In the opened PHP container CLI run this to install libraries (you can exit this CLI after successful run)
+   ```sh
+   composer install
+   ```
+8. Visit http://localhost:55000/finance.php
+9. You can log in with **test** both as login and password. Or register a new user
+10. When you end - don't forget to stop Docker containers with command:
+    ```sh
+    docker compose stop
+    ```
 
-When you end - don't forget to stop Docker containers with command:
-
-`docker compose stop`
+### DB connection:
+* **Host**: localhost
+* **Port**: 55002
+* **User** & **password**: user
 
 ## Appearance
 
