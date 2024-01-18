@@ -1,11 +1,11 @@
 {
   "require": {
     "ext-iconv": "*",
+    "ext-json": "*",
+    "ext-pdo": "*",
     "ext-simplexml": "*",
     "monolog/monolog": "^3.2",
-    "vlucas/phpdotenv": "*",
-    "ext-pdo": "*",
-    "ext-json": "*"
+    "vlucas/phpdotenv": "*"
   },
   "autoload": {
     "psr-4": {
